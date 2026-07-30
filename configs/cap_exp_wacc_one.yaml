@@ -1,0 +1,79 @@
+# SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
+#
+# SPDX-License-Identifier: CC0-1.0
+
+run:
+  name: "benckmark_run_2024" # optional; stores intermediate files in a subfolder (e.g. "KZ" → resources/KZ/, results/KZ/); empty = no subfolder
+
+countries: ["NG"]
+
+scenario:
+  simpl: [""]
+  ll: ["v1.0"]
+  clusters: [10]
+  opts: [3h]
+  
+  snapshots:
+  start: "2013-01-01"
+  end: "2014-01-01"
+  inclusive: "left" # end is not inclusive
+
+enable:
+  # ----------------- Retrieving data -----------------
+  retrieve_databundle: true # recommended for first run
+  download_osm_data: true # download OpenStreetMap data for the countries specified above
+  retrieve_cutout: true # retrieves the bundled 2013 cutout (cutout-2013-era5); changing load_options.weather_year (default: 2013) requires retrieve_cutout:false and build_cutout: true.
+  retrieve_cost_data: true # false: use existing data/costs.csv
+  retrieve_databundle_sector: false
+  download_global_buildings: false # download GlobalMLBuildingFootprints data for the countries specified above
+
+clustering:
+   exclude_carriers: [oil, gas, coal] # carriers to exclude from clustering (e.g. "oil", "gas", "coal", "biomass", "nuclear", "H2")
+   remove_stubs: true
+   p_threshold_drop_isolated: 20
+
+base_network:
+  min_voltage_rebase_voltage: 330000 # [V] minimum voltage in base network
+
+load_options:
+  source: "gegis" # "gegis" (scenario-based: 2011, 2013, 2018 available) or "demcast" (hourly 2000–2024 available): view [issue #1724](https://github.com/pypsa-meets-earth/pypsa-earth/issues/1724) for more details
+  weather_year: 2013 # Weather year of the load profile
+  prediction_year: 2030 # Valid only if "gegis" used as a source
+  scale: 1 # scales all load time-series, i.e. 2 = doubles load
+
+# ------------------- Electricity grid -------------------
+electricity:
+  extendable_carriers:
+    Generator: [] # Remove 'offwind-ac' and 'offwind-dc' for landlocked countries (e.g., Jordan, Austria, Switzerland)
+    Store: []
+  # ----------------- Existing powerplants -------------------
+  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
+  custom_powerplants: false #  "false" use only powerplantmatching (ppm) data, "merge" combines ppm and custom powerplants, "replace" use only custom powerplants
+
+
+lines:s
+  s_max_pu: 1.0
+  s_nom_extendable: false
+
+costs:
+  year: 2025
+
+marginal_costs:
+  solar: 0
+  onwind: 0
+  offwind: 0.015
+  hydro: 1.05
+  coal: 72.92
+  gas:
+  ror: 0
+  oil: 4.23
+  geothermal: 0.87
+  biomass: 4.14
+  nuclear: 3.46
+  csp: 0.
+
+solving:
+  solver:
+    name: highs
+    options: highs-default
+

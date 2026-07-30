@@ -39,7 +39,8 @@ copy_default_files()
 configfile: "config.default.yaml"
 configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
-configfile: "config.yaml"
+configfile: "configs/cap_exp_wacc_one.yaml"
+
 
 
 check_config_version(config=config)
