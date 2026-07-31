@@ -75,7 +75,12 @@ from _helpers import (
     sanitize_locations,
 )
 from add_electricity import update_transmission_costs
-from utility_custom_features import add_interconnectors, load_interconnector_data
+from utility_custom_features import (
+    add_custom_line_types,
+    add_interconnectors,
+    load_custom_line_types,
+    load_interconnector_data,
+)
 
 idx = pd.IndexSlice
 
@@ -359,6 +364,14 @@ if __name__ == "__main__":
     n = pypsa.Network(snakemake.input[0])
     Nyears = n.snapshot_weightings.objective.sum() / 8760.0
     costs = pd.read_csv(snakemake.input.tech_costs, index_col=0)
+
+    # custom line types don't survive simplify_network/cluster_network's
+    # network reconstruction, so re-apply them here (same as base_network.py)
+    custom_line_types_path = snakemake.input.get("line_types")
+    if custom_line_types_path:
+        custom_line_types = load_custom_line_types(custom_line_types_path)
+        n = add_custom_line_types(n, custom_line_types)
+
     s_max_pu = snakemake.params.lines["s_max_pu"]
 
     set_line_s_max_pu(n, s_max_pu)

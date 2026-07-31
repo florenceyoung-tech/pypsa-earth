@@ -940,6 +940,16 @@ def interconnector_inputs():
     )
 
 
+def custom_line_types_input():
+    """
+    Optional custom_line_types input, re-applied in prepare_network.py since
+    it doesn't survive simplify_network/cluster_network (same reason
+    base_network_inputs() needs it too).
+    """
+    custom_line_types = config["lines"].get("custom_line_types", False)
+    return {"line_types": custom_line_types} if custom_line_types else {}
+
+
 rule prepare_network:
     params:
         links=config["links"],
@@ -952,6 +962,7 @@ rule prepare_network:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec.nc",
         tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
         **interconnector_inputs(),
+        **custom_line_types_input(),
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
     log:
