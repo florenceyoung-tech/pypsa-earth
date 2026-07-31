@@ -323,18 +323,15 @@ def retrieve_subregion(script_name):
     }
 
 
-rule base_network:
-    params:
-        voltages=config["electricity"]["voltages"],
-        transformers=config["transformers"],
-        snapshots=config["snapshots"],
-        links=config["links"],
-        lines=config["lines"],
-        hvdc_as_lines=config["electricity"]["hvdc_as_lines"],
-        countries=config["countries"],
-        base_network=config["base_network"],
-        custom_line_types=config["lines"].get("custom_line_types", False),
-    input:
+def base_network_inputs():
+    """
+    Optional custom_line_types input, ported from pypsa-zambia.
+
+    Declared as an input (not just a param) so Snakemake knows to run
+    download_line_types first when lines.custom_line_types points at a
+    file that doesn't exist yet.
+    """
+    inputs = dict(
         osm_buses="resources/" + RDIR + "base_network/all_buses_build_network.csv",
         osm_lines="resources/" + RDIR + "base_network/all_lines_build_network.csv",
         osm_converters="resources/"
@@ -345,6 +342,27 @@ rule base_network:
         + "base_network/all_transformers_build_network.csv",
         country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
         offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
+    )
+
+    custom_line_types = config["lines"].get("custom_line_types", False)
+    if custom_line_types:
+        inputs["line_types"] = custom_line_types
+
+    return inputs
+
+
+rule base_network:
+    params:
+        voltages=config["electricity"]["voltages"],
+        transformers=config["transformers"],
+        snapshots=config["snapshots"],
+        links=config["links"],
+        lines=config["lines"],
+        hvdc_as_lines=config["electricity"]["hvdc_as_lines"],
+        countries=config["countries"],
+        base_network=config["base_network"],
+    input:
+        **base_network_inputs(),
     output:
         "networks/" + RDIR + "base.nc",
     log:

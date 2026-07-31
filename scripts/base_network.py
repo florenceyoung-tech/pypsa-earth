@@ -570,7 +570,7 @@ if __name__ == "__main__":
     snapshots = snakemake.params.snapshots
     transformers = snakemake.params.transformers
     voltages = snakemake.params.voltages
-    custom_line_types_path = snakemake.params.custom_line_types
+    custom_line_types_path = snakemake.input.get("line_types")
 
     n = base_network(
         inputs,
