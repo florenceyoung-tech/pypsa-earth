@@ -89,6 +89,9 @@ if config["custom_rules"] is not []:
         include: rule
 
 
+include: "rules/retrieve.smk"
+
+
 rule clean:
     run:
         try:

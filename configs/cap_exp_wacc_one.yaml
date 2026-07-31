@@ -43,18 +43,23 @@ load_options:
 
 # ------------------- Electricity grid -------------------
 electricity:
+  voltages: [132., 330.] # Nigeria's transmission grid is 132/330 kV; default list (132/220/300/380/500/750) doesn't match
   extendable_carriers:
     Generator: [] # Remove 'offwind-ac' and 'offwind-dc' for landlocked countries (e.g., Jordan, Austria, Switzerland)
     Store: []
   # ----------------- Existing powerplants -------------------
   powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
-  custom_powerplants: false #  "false" use only powerplantmatching (ppm) data, "merge" combines ppm and custom powerplants, "replace" use only custom powerplants
+  custom_powerplants: replace #  "false" use only powerplantmatching (ppm) data, "merge" combines ppm and custom powerplants, "replace" use only custom powerplants
+  estimate_renewable_capacities:
+    stats: "irena" # fills existing solar/onwind capacity from IRENA country stats since custom_powerplants: replace has none; added as fixed (non-extendable) capacity, matching a dispatch run
 
 
 lines:
   s_max_pu: 1.0
   s_nom_extendable: false
-  custom_line_types: false # false, or path to a CSV of custom transmission line types to merge into n.line_types
+  custom_line_types: data/line_types.csv # ACSR conductor types (M-TEC/Priority Wire datasheets), see Zenodo record 473405
+  ac_types:
+    330.: "ACSR Zebra 2-bundle 330.0" # Nigeria's primary transmission voltage; not in the default ac_types map
 
 costs:
   year: 2025
