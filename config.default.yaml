@@ -248,6 +248,7 @@ lines:
   s_nom_max_min: -.inf
   length_factor: 1.25
   under_construction: "zero" # 'zero': set capacity to zero, 'remove': remove, 'keep': with full capacity
+  custom_line_types: false # false, or path to a CSV of custom transmission line types to merge into n.line_types
 
 links:
   p_max_pu: 1.0
@@ -954,6 +955,12 @@ solving:
     glpk-default: {} # Used in CI
 
   mem: 30000 #memory in MB; 20 GB enough for 50+B+I+H2; 100 GB for 181+B+I+H2
+
+
+# =================== VALIDATION ===================
+validation:
+  interconnectors:
+    enable: false # add cross-border interconnector links/buses for countries outside `countries`; requires countries/links/substations CSVs, see interconnector_inputs() in the Snakefile
 
 
 # =================== PLOTTING ===================

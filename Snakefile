@@ -330,6 +330,7 @@ rule base_network:
         hvdc_as_lines=config["electricity"]["hvdc_as_lines"],
         countries=config["countries"],
         base_network=config["base_network"],
+        custom_line_types=config["lines"].get("custom_line_types", False),
     input:
         osm_buses="resources/" + RDIR + "base_network/all_buses_build_network.csv",
         osm_lines="resources/" + RDIR + "base_network/all_lines_build_network.csv",
@@ -893,6 +894,31 @@ rule add_extra_components:
         "scripts/add_extra_components.py"
 
 
+def interconnector_inputs():
+    """
+    Optional cross-border interconnector inputs, ported from pypsa-zambia.
+
+    Only requested when validation.interconnectors.enable is set, so runs
+    that don't use this feature never need these files to exist.
+    """
+    interconnectors_config = config.get("validation", {}).get("interconnectors", {})
+
+    if not interconnectors_config.get("enable", False):
+        return {}
+
+    return dict(
+        power_pool_countries=interconnectors_config.get(
+            "countries", "data/interconnector_countries.csv"
+        ),
+        power_pool_links=interconnectors_config.get(
+            "links", "data/interconnector_links.csv"
+        ),
+        substations=interconnectors_config.get(
+            "substations", "data/interconnector_substations.csv"
+        ),
+    )
+
+
 rule prepare_network:
     params:
         links=config["links"],
@@ -900,9 +926,11 @@ rule prepare_network:
         s_max_pu=config["lines"]["s_max_pu"],
         electricity=config["electricity"],
         co2=config["co2"],
+        countries=config["countries"],
     input:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec.nc",
         tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
+        **interconnector_inputs(),
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
     log:
@@ -2365,6 +2393,7 @@ rule run_scenario:
     threads: 1
     resources:
         mem_mb=5000,
+        scenario_runner=1,  # ensures only one scenario runs at a time (shared config.yaml)
     run:
         from build_test_configs import create_test_config
         import yaml

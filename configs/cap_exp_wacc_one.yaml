@@ -30,13 +30,13 @@ enable:
 clustering:
    exclude_carriers: [oil, gas, coal] # carriers to exclude from clustering (e.g. "oil", "gas", "coal", "biomass", "nuclear", "H2")
    remove_stubs: true
-   p_threshold_drop_isolated: 20
+   p_threshold_drop_isolated: 100
 
 base_network:
   min_voltage_rebase_voltage: 330000 # [V] minimum voltage in base network
 
 load_options:
-  source: "gegis" # "gegis" (scenario-based: 2011, 2013, 2018 available) or "demcast" (hourly 2000–2024 available): view [issue #1724](https://github.com/pypsa-meets-earth/pypsa-earth/issues/1724) for more details
+  source: "demcast" # "gegis" (scenario-based: 2011, 2013, 2018 available) or "demcast" (hourly 2000–2024 available): view [issue #1724](https://github.com/pypsa-meets-earth/pypsa-earth/issues/1724) for more details
   weather_year: 2013 # Weather year of the load profile
   prediction_year: 2030 # Valid only if "gegis" used as a source
   scale: 1 # scales all load time-series, i.e. 2 = doubles load
@@ -51,9 +51,10 @@ electricity:
   custom_powerplants: false #  "false" use only powerplantmatching (ppm) data, "merge" combines ppm and custom powerplants, "replace" use only custom powerplants
 
 
-lines:s
+lines:
   s_max_pu: 1.0
   s_nom_extendable: false
+  custom_line_types: false # false, or path to a CSV of custom transmission line types to merge into n.line_types
 
 costs:
   year: 2025
@@ -76,4 +77,8 @@ solving:
   solver:
     name: highs
     options: highs-default
+
+validation:
+  interconnectors:
+    enable: false # add cross-border interconnector links/buses for countries outside `countries`; requires countries/links/substations CSVs, see interconnector_inputs() in the Snakefile
 

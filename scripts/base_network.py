@@ -67,6 +67,7 @@ import shapely.prepared
 import shapely.wkt
 from _helpers import configure_logging, create_logger, read_csv_nafix
 from shapely.ops import unary_union
+from utility_custom_features import add_custom_line_types, load_custom_line_types
 
 logger = create_logger(__name__)
 
@@ -485,6 +486,7 @@ def base_network(
     snapshots_config,
     transformers_config,
     voltages_config,
+    custom_line_types_path=None,
 ):
     buses = _load_buses_from_osm(inputs.osm_buses).reset_index(drop=True)
     lines = _load_lines_from_osm(inputs.osm_lines).reset_index(drop=True)
@@ -535,6 +537,10 @@ def base_network(
     )
     n.lines.drop(columns="under_construction", inplace=True, errors="ignore")
 
+    if custom_line_types_path:
+        custom_line_types = load_custom_line_types(custom_line_types_path)
+        n = add_custom_line_types(n, custom_line_types)
+
     _set_lines_s_nom_from_linetypes(n)
 
     _set_countries_and_substations(inputs, base_network_config, countries_config, n)
@@ -564,6 +570,7 @@ if __name__ == "__main__":
     snapshots = snakemake.params.snapshots
     transformers = snakemake.params.transformers
     voltages = snakemake.params.voltages
+    custom_line_types_path = snakemake.params.custom_line_types
 
     n = base_network(
         inputs,
@@ -575,6 +582,7 @@ if __name__ == "__main__":
         snapshots,
         transformers,
         voltages,
+        custom_line_types_path,
     )
 
     n.buses = pd.DataFrame(n.buses.drop(columns="geometry"))
