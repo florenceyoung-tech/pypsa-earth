@@ -64,6 +64,13 @@ lines:
 
 costs:
   year: 2025
+  discountrate_groups:
+    renewable:
+      rate: 0.071
+      carriers: [solar-rooftop, solar-utility, onwind, offwind, offwind-ac-station, offwind-ac-connection-submarine, offwind-ac-connection-underground, offwind-dc-station, offwind-dc-connection-submarine, offwind-dc-connection-underground, hydro, geothermal, biomass]
+    conventional:
+      rate: 0.086
+      carriers: [nuclear, oil, OCGT, CCGT, coal, lignite]
 
 marginal_costs:
   solar: 0

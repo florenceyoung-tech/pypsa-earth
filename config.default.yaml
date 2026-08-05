@@ -409,7 +409,15 @@ renewable:
 costs:
   year: 2030 # cost file selection, i.e. costs_2030.csv in this case; reference year for costs is always 2020
   technology_data_version: v0.13.2
-  discountrate: [0.071] #, 0.086, 0.111]
+  discountrate: [0.071] #, 0.086, 0.111] # global discount rate applied to all technologies, overriding any technology-specific rate from technology-data; set to [] to fall back to technology-data's per-technology discount rate (missing entries filled with fill_values.discount rate)
+  # discountrate_groups: # optional: per-carrier-group discount rate, overriding `discountrate` above for the listed carriers only
+  # carriers are technology-data technology names (resources/costs_*.csv index), not PyPSA-Earth carrier names -- e.g. solar capital cost is blended from solar-rooftop/solar-utility, and offwind-ac/dc capital cost is built from offwind + the {carrier}-station/-connection-* rows, so those sub-technologies must be listed individually
+  #   renewable:
+  #     rate: 0.071
+  #     carriers: [solar-rooftop, solar-utility, onwind, offwind, offwind-ac-station, offwind-ac-connection-submarine, offwind-ac-connection-underground, offwind-dc-station, offwind-dc-connection-submarine, offwind-dc-connection-underground, hydro, geothermal, biomass]
+  #   conventional:
+  #     rate: 0.086
+  #     carriers: [nuclear, oil, OCGT, CCGT, coal, lignite]
   country_specific_data: "" # (optional) Reference to the desired technology-data directory for techno-economic input data; Only "" and "US" supported, for other values check the technology-data output directory
   # Only needed if "US" is selected as `country_specific_data`, otherwise ignore
   cost_scenario: "moderate" # only used if `country_specific_data: "US"`; can be "moderate", "advanced" or "conservative"

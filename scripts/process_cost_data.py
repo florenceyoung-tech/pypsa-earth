@@ -28,6 +28,8 @@ Relevant Settings
         default_exchange_rate:
         future_exchange_rate_strategy:
         custom_future_exchange_rate:
+        discountrate:  # optional global discount rate override applied to all technologies
+        discountrate_groups:  # optional per-carrier-group discount rate override, takes precedence over discountrate above
         investment:  # optional overwrites for specific attributes
         lifetime:
         FOM:
@@ -54,6 +56,39 @@ currency_converter = CurrencyConverter(
 )
 
 logger = logging.getLogger(__name__)
+
+
+def apply_discountrate_groups(costs: pd.DataFrame, discountrate_groups: dict) -> None:
+    """
+    Overwrite the 'discount rate' column in-place for technologies belonging
+    to each carrier group (e.g. "renewable", "conventional").
+
+    Applied after any flat/global discountrate override, so group-specific
+    rates take precedence for the carriers they list.
+
+    Parameters
+    ----------
+    costs : pd.DataFrame
+        Cost DataFrame indexed by technology, with a "discount rate" column.
+    discountrate_groups : dict
+        Mapping of group name to {"rate": float, "carriers": list[str]}.
+    """
+    for group_name, group in discountrate_groups.items():
+        rate = group.get("rate")
+        carriers = group.get("carriers", [])
+        if rate is None:
+            continue
+        techs = [c for c in carriers if c in costs.index]
+        missing = [c for c in carriers if c not in costs.index]
+        if missing:
+            logger.warning(
+                f"Carriers {missing} in discountrate_groups.{group_name} not found in cost data; skipping."
+            )
+        if techs:
+            costs.loc[techs, "discount rate"] = rate
+            logger.info(
+                f"Overwriting discount rate of {group_name} technologies {techs} to {rate}"
+            )
 
 
 # PYPSA-EARTH-SEC
@@ -364,6 +399,16 @@ def load_costs(
                 f"Overwriting {attr} of {overwrites.index} to {overwrites.values}"
             )
 
+    if config.get("discountrate"):
+        global_discountrate = config["discountrate"][0]
+        costs["discount rate"] = global_discountrate
+        logger.info(
+            f"Overwriting discount rate of all technologies to {global_discountrate}"
+        )
+
+    if config.get("discountrate_groups"):
+        apply_discountrate_groups(costs, config["discountrate_groups"])
+
     costs["capital_cost"] = (
         (annuity(costs["lifetime"], costs["discount rate"]) + costs["FOM"] / 100.0)
         * costs["investment"]
@@ -531,6 +576,16 @@ def prepare_costs(
             logger.info(
                 f"Overwriting {attr} of {overwrites.index} to {overwrites.values}"
             )
+
+    if config.get("discountrate"):
+        global_discountrate = config["discountrate"][0]
+        modified_costs["discount rate"] = global_discountrate
+        logger.info(
+            f"Overwriting discount rate of all technologies to {global_discountrate}"
+        )
+
+    if config.get("discountrate_groups"):
+        apply_discountrate_groups(modified_costs, config["discountrate_groups"])
 
     def annuity_factor(v):
         return annuity(v["lifetime"], v["discount rate"]) + v["FOM"] / 100
