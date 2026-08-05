@@ -71,20 +71,24 @@ costs:
     conventional:
       rate: 0.086
       carriers: [nuclear, oil, OCGT, CCGT, coal, lignite]
-
-marginal_costs:
-  solar: 0
-  onwind: 0
-  offwind: 0.015
-  hydro: 1.05
-  coal: 72.92
-  gas:
-  ror: 0
-  oil: 4.23
-  geothermal: 0.87
-  biomass: 4.14
-  nuclear: 3.46
-  csp: 0.
+  # NOTE: was previously a top-level `marginal_costs:` (plural) block, which process_cost_data.py never reads (it only reads costs.marginal_cost, singular); moved here so it actually takes effect
+  marginal_cost: # EUR/MWh
+    solar: 0
+    onwind: 0
+    offwind: 0.015
+    hydro: 1.05
+    coal: 72.92
+    ror: 0
+    oil: 4.23
+    geothermal: 0.87
+    biomass: 4.14
+    nuclear: 3.46
+    csp: 0.
+    # OCGT/CCGT: VOM (data/costs.csv: OCGT 3.00 EUR/MWh @ eff 0.39, CCGT 4.00 EUR/MWh @ eff 0.50)
+    # + Nigeria's regulated gas-to-power price (NMDPRA base price, $2.18/MMBtu as of Apr 2026)
+    # converted to ~5.60 EUR/MWh_th at 0.293071 MWh/MMBtu and 0.7532 EUR/USD / efficiency
+    OCGT: 17.37 # 3.00 + 5.60 / 0.39
+    CCGT: 15.21 # 4.00 + 5.60 / 0.50
 
 solving:
   solver:
