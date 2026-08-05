@@ -1,0 +1,97 @@
+# SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# 2030 Nigeria capacity-expansion scenario. Cooptimizes new generation and
+# transmission build-out (scenario.ll: copt) against 2030 demand and cost
+# assumptions. Only overrides are listed here -- everything else is
+# inherited from config.default.yaml.
+
+run:
+  name: "cap_exp_2030_NG" # stores intermediate files in resources/cap_exp_2030_NG/, results/cap_exp_2030_NG/
+
+countries: ["NG"]
+
+scenario:
+  simpl: [""]
+  ll: ["copt"] # cost-capped, cost-optimal (uncapped) transmission expansion -- lets line capacity be built out jointly with generation capacity, see set_transmission_limit() in scripts/prepare_network.py
+  clusters: [10]
+  opts: [3h]
+
+  snapshots:
+  start: "2013-01-01"
+  end: "2014-01-01"
+  inclusive: "left" # end is not inclusive
+
+enable:
+  # ----------------- Retrieving data -----------------
+  retrieve_databundle: true # recommended for first run
+  download_osm_data: true # download OpenStreetMap data for the countries specified above
+  retrieve_cutout: true # retrieves the bundled 2013 cutout (cutout-2013-era5); changing load_options.weather_year (default: 2013) requires retrieve_cutout:false and build_cutout: true.
+  retrieve_cost_data: true # false: use existing data/costs.csv
+  retrieve_databundle_sector: false
+  download_global_buildings: false # download GlobalMLBuildingFootprints data for the countries specified above
+
+clustering:
+   exclude_carriers: [oil, gas, coal] # carriers to exclude from clustering (e.g. "oil", "gas", "coal", "biomass", "nuclear", "H2")
+   remove_stubs: true
+   p_threshold_drop_isolated: 100
+
+base_network:
+  min_voltage_rebase_voltage: 330000 # [V] minimum voltage in base network
+
+load_options:
+  source: "demcast" # "gegis" (scenario-based: 2011, 2013, 2018 available) or "demcast" (hourly 2000–2024 available): view [issue #1724](https://github.com/pypsa-meets-earth/pypsa-earth/issues/1724) for more details
+  weather_year: 2013 # representative historical weather year for renewable profiles; independent of the 2030 cost/demand target year
+  prediction_year: 2030 # Valid only if "gegis" used as a source
+  scale: 2.416 # rescales annual demand from 28.88 TWh (unscaled demcast model output for NG) to Nigeria's 2030 forecast of 69,783 GWh; source: "Estimation and Forecasting of Nigeria's Residential, Commercial, and Industrial Electricity Demands", IEEE Access (2025); 69.783 / 28.88 = 2.416
+
+# ------------------- Electricity grid -------------------
+electricity:
+  base_voltage: 330.
+  voltages: [132., 330.] # Nigeria's transmission grid is 132/330 kV; default list (132/220/300/380/500/750) doesn't match
+  extendable_carriers:
+    Generator: [solar, onwind, offwind-ac, offwind-dc, OCGT, CCGT] # allow new-build capacity for these carriers so generation is cooptimized against transmission expansion (scenario.ll: copt above)
+    Store: []
+  # ----------------- Existing powerplants -------------------
+  powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030 or DateIn != DateIn) # existing fleet still operating in the 2030 target year (2024 -> 2030 vs. the wacc_one scenario)
+  custom_powerplants: replace #  "false" use only powerplantmatching (ppm) data, "merge" combines ppm and custom powerplants, "replace" use only custom powerplants
+  estimate_renewable_capacities:
+    stats: "irena" # fills existing solar/onwind capacity from IRENA country stats since custom_powerplants: replace has none; added as fixed (non-extendable) capacity, matching a dispatch run
+
+
+lines:
+  s_max_pu: 1.0
+  custom_line_types: data/line_types.csv # ACSR conductor types (M-TEC/Priority Wire datasheets), see Zenodo record 473405
+  ac_types:
+    330.: "ACSR Zebra 2-bundle 330.0" # Nigeria's primary transmission voltage; not in the default ac_types map
+
+costs:
+  year: 2030 # technology cost assumptions for the 2030 target year
+  discountrate: [0.10] # 10% discount rate applied uniformly to every technology, renewable and fuel-powered alike
+  marginal_cost: # EUR/MWh; carried over from the cap_exp_wacc_one (2025) scenario -- revisit if 2030 fuel-price assumptions should differ
+    solar: 0
+    onwind: 0
+    offwind: 0.015
+    hydro: 1.05
+    coal: 72.92
+    ror: 0
+    oil: 4.23
+    geothermal: 0.87
+    biomass: 4.14
+    nuclear: 3.46
+    csp: 0.
+    # OCGT/CCGT: VOM (data/costs.csv: OCGT 3.00 EUR/MWh @ eff 0.39, CCGT 4.00 EUR/MWh @ eff 0.50)
+    # + Nigeria's regulated gas-to-power price (NMDPRA base price, $2.18/MMBtu as of Apr 2026)
+    # converted to ~5.60 EUR/MWh_th at 0.293071 MWh/MMBtu and 0.7532 EUR/USD / efficiency
+    OCGT: 17.37 # 3.00 + 5.60 / 0.39
+    CCGT: 15.21 # 4.00 + 5.60 / 0.50
+
+solving:
+  solver:
+    name: highs
+    options: highs-default
+
+validation:
+  interconnectors:
+    enable: false # add cross-border interconnector links/buses for countries outside `countries`; requires countries/links/substations CSVs, see interconnector_inputs() in the Snakefile
