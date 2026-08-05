@@ -43,6 +43,7 @@ load_options:
 
 # ------------------- Electricity grid -------------------
 electricity:
+  base_voltage: 330.
   voltages: [132., 330.] # Nigeria's transmission grid is 132/330 kV; default list (132/220/300/380/500/750) doesn't match
   extendable_carriers:
     Generator: [] # Remove 'offwind-ac' and 'offwind-dc' for landlocked countries (e.g., Jordan, Austria, Switzerland)
