@@ -1,0 +1,257 @@
+# SPDX-FileCopyrightText: PyPSA-Earth and PyPSA-Eur Authors
+# SPDX-License-Identifier: CC0-1.0
+#
+# NIGERIA DISPATCH VALIDATION MODEL, WEATHER YEAR 2024
+# Fixed capacity dispatch run, no expansion. Checks that modelled 2024 dispatch
+# reproduces observed 2024 generation before expansion scenarios are built.
+#
+# RUN: snakemake --configfile configs/config.nigeria.2024.yaml -j4 solve_all_networks
+#
+# PREREQUISITE: comment out line 42 of the Snakefile
+#   (configs/cap_exp_2030_split_wacc.yaml). That is a capacity expansion config
+#   and must not sit as a base layer under a validation run.
+#
+# INHERITANCE: PyPSA-Earth reads config.default.yaml first and overlays this
+#   file. Anything not written here falls back to the default silently.
+
+version: 0.8.0
+tutorial: false
+
+run:
+  name: "nigeria_2024_validation"
+
+countries: ["NG"]
+
+# --- SCENARIO AND SNAPSHOTS --------------------------------------------------
+# opts 1h: hourly resolution. Dispatch validation compares hourly behaviour;
+#   coarser resolution smooths out the ramping this run is meant to test.
+# snapshots is a TOP LEVEL key, a sibling of scenario, NOT nested inside it.
+
+scenario:
+  simpl: [""]
+  ll: ["v1.0"]
+  clusters: [10]
+  opts: [1h]
+
+snapshots:
+  start: "2024-01-01"
+  end: "2025-01-01"
+  inclusive: "left"      # excludes 2025-01-01, giving 8784 hours (2024 is a leap year)
+
+# --- DATA RETRIEVAL ----------------------------------------------------------
+# retrieve_cutout false / build_cutout true: the bundled cutout is 2013 ERA5
+#   only. Using it would generate renewable profiles from 2013 weather while
+#   validating against 2024 generation. Needs a CDS API key.
+
+enable:
+  retrieve_databundle: false         # set false on later runs once extracted
+  retrieve_databundle_sector: false
+  download_osm_data: true
+  download_global_buildings: false
+  retrieve_cutout: false
+  build_cutout: true
+  retrieve_cost_data: true
+  build_natura_raster: true
+  progress_bar: true
+
+# --- CUTOUT ------------------------------------------------------------------
+# Time range must match snapshots above.
+
+atlite:
+  nprocesses: 4
+  cutouts:
+    cutout-2024-era5:
+      module: era5
+      dx: 0.3
+      dy: 0.3
+      time: ["2024-01-01", "2025-01-01"]
+  default: cutout-2024-era5
+
+# --- RENEWABLE RESOURCE PROFILES ---------------------------------------------
+# extendable false on every carrier: fixed capacity dispatch. Must stay
+#   consistent with the empty extendable_carriers lists below. These flip to
+#   true for expansion scenarios later.
+
+renewable:
+
+  onwind:
+    cutout: auto
+    resource:
+      method: wind
+      turbine: Vestas_V112_3MW
+      # Chosen on specific power grounds, compared against V90 and E126:
+      #   V112 rated 13 m/s, 0.31 kW/m2 | V90 15 m/s, 0.47 | E126 17 m/s, 0.61
+      # Lower rated speed suits Nigeria's moderate wind. Barely affects the 2024
+      # result (10 MW of wind nationally) but matters for expansion scenarios.
+    capacity_per_sqkm: 3
+    copernicus:
+      grid_codes: [20, 30, 40, 60, 100, 111, 112, 113, 114, 115, 116, 121, 122, 123, 124, 125, 126]
+      distance: 1000
+      distance_grid_codes: [50]
+    natura: true
+    potential: simple
+    clip_p_max_pu: 1.e-2
+    extendable: false
+
+  solar:
+    cutout: auto
+    resource:
+      method: pv
+      panel: CSi
+      orientation: latitude_optimal
+    capacity_per_sqkm: 4.6
+    correction_factor: 1.0
+    # Left uncorrected on purpose. correction_factor accepts only ONE scalar for
+    # the whole carrier, which cannot represent Nigeria's north to south
+    # irradiance gradient (PVsyst: ~20% CF north vs ~16% south). Calibrate after
+    # this run by applying band specific factors to n.generators_t.p_max_pu.
+    copernicus:
+      grid_codes: [20, 30, 40, 50, 60, 90, 100]
+    natura: true
+    potential: simple
+    clip_p_max_pu: 1.e-2
+    extendable: false
+
+  hydro:
+    cutout: auto
+    hydrobasins_level: 6
+    resource:
+      method: hydro
+      hydrobasins: data/hydrobasins/hybas_world.shp
+      flowspeed: 1.0
+    carriers: [ror, hydro]     # no PHS in Nigeria's operating fleet
+    hydro_max_hours: "energy_capacity_totals_by_country"
+    hydro_max_hours_default: 6.0
+    clip_min_inflow: 1.0
+    extendable: false
+    normalization:
+      method: eia
+      year: 2023               # set to the latest year with data for Nigeria
+    multiplier: 1.0
+    hydro_min_inflow_pu: 1.0
+    # Capacity and location for Kainji, Jebba, Shiroro come from
+    # data/custom_powerplants.csv. This block supplies only the hourly inflow
+    # time series, built by atlite from HydroBASINS runoff. The CSV has no
+    # time series, which is why this block is required.
+
+# --- CLUSTERING --------------------------------------------------------------
+# feature solar+onwind-time clusters buses by renewable TIME SERIES similarity.
+#   Without it, collapsing to 10 nodes can average the northern solar and wind
+#   resource together with weaker regions, erasing the gradient this model needs.
+
+clustering:
+  exclude_carriers: [oil, gas, coal]
+  remove_stubs: true
+  p_threshold_drop_isolated: 100
+  simplify_network:
+    algorithm: kmeans
+    feature: solar+onwind-time
+  cluster_network:
+    algorithm: kmeans
+    feature: solar+onwind-time
+
+# --- BASE NETWORK ------------------------------------------------------------
+
+base_network:
+  min_voltage_rebase_voltage: 330000
+
+# --- LOAD --------------------------------------------------------------------
+# ACTION REQUIRED on scale. The old value 1.302 rescaled demcast's 2013 output
+#   (28.88 TWh) to 2024 generation of 37.6 TWh. weather_year is now 2024, so
+#   demcast's output differs and 1.302 is stale.
+#   To recompute: run with scale 1 through add_electricity, then in Python
+#     n.loads_t.p_set.sum().sum() / 1e6   -> annual TWh
+#   New scale = 37.6 / that value. Record both numbers here.
+#
+# NOTE: 37.6 TWh is GENERATION, not demand. Scaling to generation is correct for
+#   dispatch validation, but the resulting load series represents SERVED demand
+#   and must not be read as a demand estimate. It also absorbs network losses.
+
+load_options:
+  source: "demcast"
+  weather_year: 2024
+  prediction_year: 2030
+  scale: 1                   # PLACEHOLDER, recompute per note above
+
+# --- ELECTRICITY -------------------------------------------------------------
+# renewable_carriers: stops offshore wind generators being added. Nigeria had no
+#   offshore wind in 2024. Without this key the workflow falls back to every
+#   carrier in the renewable block, including inherited offwind entries.
+# extendable_carriers all empty: this is what makes it a validation run rather
+#   than an expansion run.
+# custom_powerplants replace: uses your TCN matched plant list exclusively.
+
+electricity:
+  base_voltage: 330.
+  voltages: [132., 330.]
+  renewable_carriers: [solar, onwind, hydro]
+  conventional_carriers: [oil, OCGT, CCGT, coal, biomass]
+  extendable_carriers:
+    Generator: []
+    StorageUnit: []
+    Store: []
+  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
+  custom_powerplants: replace
+  estimate_renewable_capacities:
+    stats: "irena"
+    year: 2023             # latest available; check for 2024 before final run
+
+# --- LINES -------------------------------------------------------------------
+# s_max_pu 1.0 rather than the 0.7 European n-1 default: this run reproduces
+#   observed dispatch, it does not enforce a contingency standard.
+
+lines:
+  s_max_pu: 1.0
+  s_nom_extendable: false
+  custom_line_types: data/line_types.csv
+  ac_types:
+    330.: "ACSR Zebra 2-bundle 330.0"
+
+# --- COSTS -------------------------------------------------------------------
+# Limited effect on fixed capacity dispatch beyond setting merit order, but kept
+#   so the same file carries into expansion scenarios.
+# OCGT/CCGT marginal cost = technology VOM + Nigeria's regulated gas to power
+#   price (NMDPRA base, $2.18/MMBtu Apr 2026) at 0.293071 MWh/MMBtu and
+#   0.7532 EUR/USD, divided by plant efficiency.
+
+costs:
+  year: 2025
+  discountrate_groups:
+    renewable:
+      rate: 0.071
+      carriers: [solar-rooftop, solar-utility, onwind, offwind, offwind-ac-station, offwind-ac-connection-submarine, offwind-ac-connection-underground, offwind-dc-station, offwind-dc-connection-submarine, offwind-dc-connection-underground, hydro, geothermal, biomass]
+    conventional:
+      rate: 0.086
+      carriers: [nuclear, oil, OCGT, CCGT, coal, lignite]
+  marginal_cost:            # EUR/MWh, singular key; the plural form is never read
+    solar: 0
+    onwind: 0
+    offwind: 0.015
+    hydro: 1.05
+    coal: 72.92
+    ror: 0
+    oil: 4.23
+    geothermal: 0.87
+    biomass: 4.14
+    nuclear: 3.46
+    csp: 0.
+    OCGT: 17.37             # 3.00 VOM + 5.60 fuel / 0.39 efficiency
+    CCGT: 15.21             # 4.00 VOM + 5.60 fuel / 0.50 efficiency
+
+# --- SOLVING -----------------------------------------------------------------
+
+solving:
+  options:
+    load_shedding: 100
+  solver:
+    name: gurobi
+    options: gurobi-default
+
+# --- VALIDATION --------------------------------------------------------------
+# Interconnectors off. Nigeria exports to Niger, Benin and Togo via WAPP, but
+#   modelling that needs extra countries, links and substations CSVs. Revisit
+#   when the WAPP regional work begins.
+
+validation:
+  interconnectors:
+    enable: false

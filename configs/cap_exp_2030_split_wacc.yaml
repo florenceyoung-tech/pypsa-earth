@@ -28,9 +28,9 @@ scenario:
 
 enable:
   # ----------------- Retrieving data -----------------
-  retrieve_databundle: true # recommended for first run
+  retrieve_databundle: false # recommended for first run
   download_osm_data: true # download OpenStreetMap data for the countries specified above
-  retrieve_cutout: true # retrieves the bundled 2013 cutout (cutout-2013-era5); changing load_options.weather_year (default: 2013) requires retrieve_cutout:false and build_cutout: true.
+  retrieve_cutout: false # retrieves the bundled 2013 cutout (cutout-2013-era5); changing load_options.weather_year (default: 2013) requires retrieve_cutout:false and build_cutout: true.
   retrieve_cost_data: true # false: use existing data/costs.csv
   retrieve_databundle_sector: false
   download_global_buildings: false # download GlobalMLBuildingFootprints data for the countries specified above
@@ -54,7 +54,7 @@ electricity:
   base_voltage: 330.
   voltages: [132., 330.] # Nigeria's transmission grid is 132/330 kV; default list (132/220/300/380/500/750) doesn't match
   extendable_carriers:
-    Generator: [solar, onwind, offwind-ac, offwind-dc, OCGT, CCGT] # allow new-build capacity for these carriers so generation is cooptimized against transmission expansion (scenario.ll: copt above)
+    Generator: [solar, onwind, OCGT, CCGT, coal] # allow new-build capacity for these carriers so generation is cooptimized against transmission expansion (scenario.ll: copt above)
     Store: []
   # ----------------- Existing powerplants -------------------
   powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030 or DateIn != DateIn) # existing fleet still operating in the 2030 target year
@@ -73,11 +73,11 @@ costs:
   year: 2030 # technology cost assumptions for the 2030 target year
   discountrate_groups: # separate discount rate for renewables vs. fossil-fuelled ("fossil") technologies, instead of cap_exp_2030.yaml's flat 10% for both
     renewable:
-      rate: 0.071
-      carriers: [solar-rooftop, solar-utility, onwind, offwind, offwind-ac-station, offwind-ac-connection-submarine, offwind-ac-connection-underground, offwind-dc-station, offwind-dc-connection-submarine, offwind-dc-connection-underground, hydro, geothermal, biomass]
+      rate: 0.1379 #Hatton 13.79% for renewables
+      carriers: [solar-utility, onwind, hydro]
     fossil:
-      rate: 0.086
-      carriers: [nuclear, oil, OCGT, CCGT, coal, lignite]
+      rate: 0.1486 #Hatton et al. for gas
+      carriers: [OCGT, CCGT, coal]
   marginal_cost: # EUR/MWh; carried over from the cap_exp_wacc_one (2025) scenario -- revisit if 2030 fuel-price assumptions should differ
     solar: 0
     onwind: 0
@@ -98,8 +98,8 @@ costs:
 
 solving:
   solver:
-    name: highs
-    options: highs-default
+    name: gurobi
+    options: gurobi-default
 
 validation:
   interconnectors:

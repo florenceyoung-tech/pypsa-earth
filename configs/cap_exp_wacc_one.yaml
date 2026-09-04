@@ -92,8 +92,8 @@ costs:
 
 solving:
   solver:
-    name: highs
-    options: highs-default
+    name: gurobi
+    options: gurobi-default
 
 validation:
   interconnectors:

@@ -25,9 +25,9 @@ scenario:
 
 enable:
   # ----------------- Retrieving data -----------------
-  retrieve_databundle: true # recommended for first run
+  retrieve_databundle: false # recommended for first run
   download_osm_data: true # download OpenStreetMap data for the countries specified above
-  retrieve_cutout: true # retrieves the bundled 2013 cutout (cutout-2013-era5); changing load_options.weather_year (default: 2013) requires retrieve_cutout:false and build_cutout: true.
+  retrieve_cutout: false # retrieves the bundled 2013 cutout (cutout-2013-era5); changing load_options.weather_year (default: 2013) requires retrieve_cutout:false and build_cutout: true.
   retrieve_cost_data: true # false: use existing data/costs.csv
   retrieve_databundle_sector: false
   download_global_buildings: false # download GlobalMLBuildingFootprints data for the countries specified above
@@ -51,7 +51,7 @@ electricity:
   base_voltage: 330.
   voltages: [132., 330.] # Nigeria's transmission grid is 132/330 kV; default list (132/220/300/380/500/750) doesn't match
   extendable_carriers:
-    Generator: [solar, onwind, offwind-ac, offwind-dc, OCGT, CCGT] # allow new-build capacity for these carriers so generation is cooptimized against transmission expansion (scenario.ll: copt above)
+    Generator: [solar, onwind, OCGT, CCGT, coal] # allow new-build capacity for these carriers so generation is cooptimized against transmission expansion (scenario.ll: copt above)
     Store: []
   # ----------------- Existing powerplants -------------------
   powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030 or DateIn != DateIn) # existing fleet still operating in the 2030 target year (2024 -> 2030 vs. the wacc_one scenario)
@@ -89,8 +89,8 @@ costs:
 
 solving:
   solver:
-    name: highs
-    options: highs-default
+    name: gurobi
+    options: gurobi-default
 
 validation:
   interconnectors:
