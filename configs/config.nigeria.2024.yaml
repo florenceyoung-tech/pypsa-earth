@@ -49,7 +49,7 @@ enable:
   download_osm_data: true
   download_global_buildings: false
   retrieve_cutout: false
-  build_cutout: true
+  build_cutout: false
   retrieve_cost_data: true
   build_natura_raster: true
   progress_bar: true
@@ -101,10 +101,12 @@ renewable:
       orientation: latitude_optimal
     capacity_per_sqkm: 4.6
     correction_factor: 1.0
-    # Left uncorrected on purpose. correction_factor accepts only ONE scalar for
-    # the whole carrier, which cannot represent Nigeria's north to south
-    # irradiance gradient (PVsyst: ~20% CF north vs ~16% south). Calibrate after
-    # this run by applying band specific factors to n.generators_t.p_max_pu.
+    # Modelled national mean CF is 0.179 against a
+    # 0.18 benchmark, with 0.195 north and 0.148 south against a PVsyst range of
+    # roughly 0.20 and 0.16. Gradient and levels both hold, so no correction is
+    # applied. Seasonal check shows no Harmattan dip in the north, consistent
+    # with ERA5 aerosol underrepresentation: noted as a limitation.
+    
     copernicus:
       grid_codes: [20, 30, 40, 50, 60, 90, 100]
     natura: true
@@ -127,7 +129,7 @@ renewable:
     normalization:
       method: eia
       year: 2023               # set to the latest year with data for Nigeria
-    multiplier: 1.0
+    multiplier: 1.214
     hydro_min_inflow_pu: 1.0
     # Capacity and location for Kainji, Jebba, Shiroro come from
     # data/custom_powerplants.csv. This block supplies only the hourly inflow
@@ -142,7 +144,7 @@ renewable:
 clustering:
   exclude_carriers: [oil, gas, coal]
   remove_stubs: true
-  p_threshold_drop_isolated: 100
+  p_threshold_drop_isolated: 5000 #drops the isolated NG1 subnetwork(~290 MW mean, no generation, no line, shed every hour)
   simplify_network:
     algorithm: kmeans
     feature: solar+onwind-time
@@ -173,6 +175,22 @@ load_options:
   prediction_year: 2030
   scale: 1                   # PLACEHOLDER, recompute per note above
 
+# --- CONVENTIONAL PLANT AVAILABILITY ------------------------------------------
+# Without these the model runs CCGT at ~80% capacity factor and never dispatches
+# OCGT at all, because CCGT is cheaper and nothing stops it running flat out.
+# Real Nigerian gas plants are limited by gas supply, maintenance and grid
+# constraints, not by cost.
+#
+# Derived from TCN 2024 hourly data: fleet generation / (installed capacity x 8784)
+#   CCGT: 9.248 TWh / (3444 MW x 8784 h) = 0.306
+#   OCGT: 16.626 TWh / (8740 MW x 8784 h) = 0.217
+
+conventional:
+  CCGT:
+    p_max_pu: 0.306
+  OCGT:
+    p_max_pu: 0.217
+
 # --- ELECTRICITY -------------------------------------------------------------
 # renewable_carriers: stops offshore wind generators being added. Nigeria had no
 #   offshore wind in 2024. Without this key the workflow falls back to every
@@ -180,6 +198,7 @@ load_options:
 # extendable_carriers all empty: this is what makes it a validation run rather
 #   than an expansion run.
 # custom_powerplants replace: uses your TCN matched plant list exclusively.
+
 
 electricity:
   base_voltage: 330.
