@@ -1,0 +1,184 @@
+# WACC SWEEP: C7. Solar/wind WACC = 13%, gas WACC fixed at 14.68% (Hatton).
+# Generated from cap_exp_2030_split_wacc.yaml by generate_wacc_sweep_configs.py -- do not hand-edit, regenerate instead.
+# SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# 2030 Nigeria capacity-expansion scenario. Cooptimizes new generation and
+# transmission build-out (scenario.ll: copt) against 2030 demand and cost
+# assumptions. Only overrides are listed here -- everything else is
+# inherited from config.default.yaml.
+
+run:
+  name: "cap_exp_2030_C7" # stores intermediate files in resources/cap_exp_2030_NG/, results/cap_exp_2030_NG/
+
+countries: ["NG"]
+ 
+scenario:
+  simpl: [""]
+  ll: ["copt"] # cost-capped, cost-optimal (uncapped) transmission expansion -- lets line capacity be built out jointly with generation capacity, see set_transmission_limit() in scripts/prepare_network.py
+  clusters: [10]
+  opts: [1h]
+ 
+snapshots:
+  start: "2024-01-01"
+  end: "2025-01-01"
+  inclusive: "left" # end is not inclusive
+ 
+enable:
+  # ----------------- Retrieving data -----------------
+  retrieve_databundle: false
+  download_osm_data: true # download OpenStreetMap data for the countries specified above
+  retrieve_cutout: false
+  build_cutout: false # cutout-2024-era5 already built by the validation run
+  retrieve_cost_data: true # false: use existing data/costs.csv
+  retrieve_databundle_sector: false
+  download_global_buildings: false
+  build_natura_raster: true
+  progress_bar: true
+ 
+atlite:
+  nprocesses: 4
+  cutouts:
+    cutout-2024-era5:
+      module: era5
+      dx: 0.3
+      dy: 0.3
+      time: ["2024-01-01", "2025-01-01"]
+  default: cutout-2024-era5
+ 
+renewable:
+  onwind:
+    cutout: auto
+    resource:
+      method: wind
+      turbine: Vestas_V112_3MW # rated 13 m/s, 0.31 kW/m2; suits Nigeria's moderate wind
+    capacity_per_sqkm: 3
+    copernicus:
+      grid_codes: [20, 30, 40, 60, 100, 111, 112, 113, 114, 115, 116, 121, 122, 123, 124, 125, 126]
+      distance: 1000
+      distance_grid_codes: [50]
+    natura: true
+    potential: simple
+    clip_p_max_pu: 1.e-2
+    extendable: true
+ 
+  solar:
+    cutout: auto
+    resource:
+      method: pv
+      panel: CSi
+      orientation: latitude_optimal
+    capacity_per_sqkm: 4.6
+    correction_factor: 1.0 # validated 2024: 0.179 national CF vs 0.18 benchmark, 0.195 north / 0.148 south
+    copernicus:
+      grid_codes: [20, 30, 40, 50, 60, 90, 100]
+    natura: true
+    potential: simple
+    clip_p_max_pu: 1.e-2
+    extendable: true
+ 
+  hydro:
+    cutout: auto
+    hydrobasins_level: 6
+    resource:
+      method: hydro
+      hydrobasins: data/hydrobasins/hybas_world.shp
+      flowspeed: 1.0
+    carriers: [ror, hydro, PHS] 
+    hydro_max_hours: "energy_capacity_totals_by_country"
+    hydro_max_hours_default: 6.0
+    clip_min_inflow: 1.0
+    extendable: false # no new dams assumed by 2030
+    normalization:
+      method: eia
+      year: 2023 # latest year in data/eia_hydro_annual_generation.csv
+    multiplier: 1.214 # TCN 2024 actual 10.474 TWh / modelled 8.63 TWh
+    hydro_min_inflow_pu: 1.0
+ 
+conventional:
+  # Observed 2024 availability from TCN: fleet generation / (capacity x 8784).
+  # Without these the model runs CCGT at ~80% CF and never dispatches OCGT.
+  CCGT:
+    p_max_pu: 0.306 # 9.248 TWh / (3444 MW x 8784 h)
+  OCGT:
+    p_max_pu: 0.217 # 16.626 TWh / (8740 MW x 8784 h)
+ 
+clustering:
+   exclude_carriers: [oil, gas, coal] # carriers to exclude from clustering (e.g. "oil", "gas", "coal", "biomass", "nuclear", "H2")
+   remove_stubs: true
+   p_threshold_drop_isolated: 100
+ 
+base_network:
+  min_voltage_rebase_voltage: 330000 # [V] minimum voltage in base network
+ 
+
+load_options:
+  source: "demcast" # "gegis" (scenario-based: 2011, 2013, 2018 available) or "demcast" (hourly 2000-2024 available): view issue #1724 for more details
+  weather_year: 2024 # matches the cutout and the validated renewable profiles
+  prediction_year: 2030 # Valid only if "gegis" used as a source
+  scale: 2.074 # 78 TWh (NIRP 2024, 2030 on-grid demand excluding self-generation) / 37.60 TWh unscaled demcast output
+ 
+# ------------------- Electricity grid -------------------
+electricity:
+  base_voltage: 330.
+  voltages: [132., 330.] # Nigeria's transmission grid is 132/330 kV; default list (132/220/300/380/500/750) doesn't match
+  renewable_carriers: [solar, onwind, hydro] # excludes offshore wind
+  conventional_carriers: [oil, OCGT, CCGT, biomass]
+  extendable_carriers:
+    Generator: [solar, onwind, OCGT, CCGT] # coal removed: no operating coal in Nigeria and none in the custom powerplant list
+    StorageUnit: [battery] # battery lets solar be time-shifted; batteries are capital intensive and therefore WACC sensitive
+    Store: []
+  max_hours:
+    battery: 6
+  # ----------------- Existing powerplants -------------------
+  powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030 or DateIn != DateIn) # existing fleet still operating in the 2030 target year
+  custom_powerplants: replace #  "false" use only powerplantmatching (ppm) data, "merge" combines ppm and custom powerplants, "replace" use only custom powerplants
+  estimate_renewable_capacities:
+    stats: "irena" # supplies the ~180 MW 2024 solar starting stock as fixed capacity; new build sits on top
+    year: 2023
+ 
+lines:
+  s_max_pu: 1.0
+  custom_line_types: data/line_types.csv # ACSR conductor types (M-TEC/Priority Wire datasheets), see Zenodo record 473405
+  ac_types:
+    330.: "ACSR Zebra 2-bundle 330.0" # Nigeria's primary transmission voltage; not in the default ac_types map
+ 
+costs:
+  year: 2030
+  discountrate_groups: # SCENARIO B: separate rates for renewable vs fossil, replacing Scenario A's flat 10%
+    renewable:
+      rate: 0.13 # Hatton et al., renewables in Nigeria
+      carriers: [solar-rooftop, solar-utility, onwind, hydro]
+    fossil:
+      rate: 0.1468 # Hatton et al., gas in Nigeria
+      carriers: [OCGT, CCGT]
+  marginal_cost: # EUR/MWh;
+    solar: 0
+    onwind: 0
+    offwind: 0.015
+    hydro: 1.05
+    coal: 72.92
+    ror: 0
+    oil: 4.23
+    geothermal: 0.87
+    biomass: 4.14
+    nuclear: 3.46
+    csp: 0.
+    # OCGT/CCGT: VOM (data/costs.csv: OCGT 3.00 EUR/MWh @ eff 0.39, CCGT 4.00 EUR/MWh @ eff 0.50)
+    # + Nigeria's regulated gas-to-power price (NMDPRA base price, $2.18/MMBtu as of Apr 2026)
+    # converted to ~5.60 EUR/MWh_th at 0.293071 MWh/MMBtu and 0.7532 EUR/USD / efficiency
+    OCGT: 17.37 # 3.00 + 5.60 / 0.39
+    CCGT: 15.21 # 4.00 + 5.60 / 0.50
+ 
+solving:
+  options:
+    load_shedding: 0.32 # EUR/kWh. estimated at the lower end of Nigerian self-generation cost (~$0.30-0.60/kWh)
+  solver:
+    name: gurobi
+    options: gurobi-default
+ 
+validation:
+  interconnectors:
+    enable: false # add cross-border interconnector links/buses for countries outside `countries`; requires countries/links/substations CSVs, see interconnector_inputs() in the Snakefile
+
