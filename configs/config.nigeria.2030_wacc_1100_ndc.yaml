@@ -1,0 +1,208 @@
+atlite:
+  cutouts:
+    cutout-2024-era5:
+      dx: 0.3
+      dy: 0.3
+      module: era5
+      time:
+      - '2024-01-01'
+      - '2025-01-01'
+  default: cutout-2024-era5
+  nprocesses: 4
+base_network:
+  min_voltage_rebase_voltage: 330000
+clustering:
+  exclude_carriers:
+  - oil
+  - gas
+  - coal
+  p_threshold_drop_isolated: 100
+  remove_stubs: true
+conventional:
+  CCGT:
+    p_max_pu: 0.306
+  OCGT:
+    p_max_pu: 0.217
+costs:
+  discountrate_groups:
+    fossil:
+      carriers:
+      - OCGT
+      - CCGT
+      rate: 0.147
+    renewable:
+      carriers:
+      - solar-rooftop
+      - solar-utility
+      - onwind
+      - hydro
+      rate: 0.11
+  marginal_cost:
+    CCGT: 4.95
+    OCGT: 4.35
+    biomass: 4.14
+    coal: 72.9
+    csp: 0.0
+    geothermal: 0.87
+    hydro: 1.05
+    nuclear: 3.46
+    offwind: 0.015
+    oil: 4.23
+    onwind: 0
+    ror: 0
+    solar: 0
+  year: 2030
+countries:
+- NG
+electricity:
+  base_voltage: 330.0
+  conventional_carriers:
+  - oil
+  - OCGT
+  - CCGT
+  - biomass
+  custom_powerplants: replace
+  estimate_renewable_capacities:
+    stats: irena
+    year: 2023
+  extendable_carriers:
+    Generator:
+    - solar
+    - onwind
+    - OCGT
+    - CCGT
+    StorageUnit:
+    - battery
+    Store: []
+  max_hours:
+    battery: 6
+  powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030
+    or DateIn != DateIn)
+  renewable_carriers:
+  - solar
+  - onwind
+  - hydro
+  voltages:
+  - 132.0
+  - 330.0
+enable:
+  build_cutout: false
+  build_natura_raster: true
+  download_global_buildings: false
+  download_osm_data: true
+  progress_bar: true
+  retrieve_cost_data: true
+  retrieve_cutout: false
+  retrieve_databundle: false
+  retrieve_databundle_sector: false
+lines:
+  ac_types:
+    330.0: ACSR Zebra 2-bundle 330.0
+  custom_line_types: data/line_types.csv
+  s_max_pu: 1.0
+load_options:
+  prediction_year: 2030
+  scale: 2.07
+  source: demcast
+  weather_year: 2024
+renewable:
+  hydro:
+    carriers:
+    - ror
+    - hydro
+    - PHS
+    clip_min_inflow: 1.0
+    cutout: auto
+    extendable: false
+    hydro_max_hours: energy_capacity_totals_by_country
+    hydro_max_hours_default: 6.0
+    hydro_min_inflow_pu: 1.0
+    hydrobasins_level: 6
+    multiplier: 1.21
+    normalization:
+      method: eia
+      year: 2023
+    resource:
+      flowspeed: 1.0
+      hydrobasins: data/hydrobasins/hybas_world.shp
+      method: hydro
+  onwind:
+    capacity_per_sqkm: 3
+    clip_p_max_pu: 0.01
+    copernicus:
+      distance: 1000
+      distance_grid_codes:
+      - 50
+      grid_codes:
+      - 20
+      - 30
+      - 40
+      - 60
+      - 100
+      - 111
+      - 112
+      - 113
+      - 114
+      - 115
+      - 116
+      - 121
+      - 122
+      - 123
+      - 124
+      - 125
+      - 126
+    cutout: auto
+    extendable: true
+    natura: true
+    potential: simple
+    resource:
+      method: wind
+      turbine: Vestas_V112_3MW
+  solar:
+    capacity_per_sqkm: 4.6
+    clip_p_max_pu: 0.01
+    copernicus:
+      grid_codes:
+      - 20
+      - 30
+      - 40
+      - 50
+      - 60
+      - 90
+      - 100
+    correction_factor: 1.0
+    cutout: auto
+    extendable: true
+    natura: true
+    potential: simple
+    resource:
+      method: pv
+      orientation: latitude_optimal
+      panel: CSi
+run:
+  name: nigeria_2030_wacc_1100_ndc
+scenario:
+  clusters:
+  - 10
+  ll:
+  - copt
+  opts:
+  - 1h
+  simpl:
+  - ''
+snapshots:
+  end: '2025-01-01'
+  inclusive: left
+  start: '2024-01-01'
+solving:
+  options:
+    load_shedding: 1.0
+  solver:
+    name: gurobi
+    options: gurobi-default
+validation:
+  interconnectors:
+    enable: false
+co2:
+  limit: 8800000.0
+  base: 0.0

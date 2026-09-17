@@ -11,7 +11,7 @@ scenario:
   simpl: [""]
   ll: ["v1.0"]
   clusters: [10]
-  opts: [3h]
+  opts: [1h]
   
   snapshots:
   start: "2013-01-01"
@@ -84,11 +84,12 @@ costs:
     biomass: 4.14
     nuclear: 3.46
     csp: 0.
-    # OCGT/CCGT: VOM (data/costs.csv: OCGT 3.00 EUR/MWh @ eff 0.39, CCGT 4.00 EUR/MWh @ eff 0.50)
-    # + Nigeria's regulated gas-to-power price (NMDPRA base price, $2.18/MMBtu as of Apr 2026)
-    # converted to ~5.60 EUR/MWh_th at 0.293071 MWh/MMBtu and 0.7532 EUR/USD / efficiency
-    OCGT: 17.37 # 3.00 + 5.60 / 0.39
-    CCGT: 15.21 # 4.00 + 5.60 / 0.50
+# OCGT/CCGT marginal cost = VOM (OCGT 3.00, CCGT 4.00 EUR/MWh)
+# + delivered gas cost (NMDPRA regulated $2.18/MMBtu + transport to $2.50/MMBtu)
+# converted to 0.552 EUR/MWh_th at 0.293071 MWh/MMBtu and 0.7532 EUR/USD
+# divided by thermal efficiency (OCGT 0.41, CCGT 0.58)
+    OCGT: 4.35 # 3.00 + 0.552 / 0.41
+    CCGT: 4.95 # 4.00 + 0.552 / 0.58
 
 solving:
   solver:

@@ -1,5 +1,5 @@
 run:
-  name: cap_exp_2030_split_wacc
+  name: cap_exp_2030_uniform_wacc_NDC
 countries:
 - NG
 scenario:
@@ -108,7 +108,7 @@ renewable:
     normalization:
       method: eia
       year: 2023
-    multiplier: 1.214
+    multiplier: 1.27
     hydro_min_inflow_pu: 1.0
 conventional:
   CCGT:
@@ -128,38 +128,8 @@ load_options:
   source: demcast
   weather_year: 2024
   prediction_year: 2030
-  scale: 2.074
-electricity:
-  base_voltage: 330.0
-  voltages:
-  - 132.0
-  - 330.0
-  renewable_carriers:
-  - solar
-  - onwind
-  - hydro
-  conventional_carriers:
-  - oil
-  - OCGT
-  - CCGT
-  - biomass
-  extendable_carriers:
-    Generator:
-    - solar
-    - onwind
-    - OCGT
-    - CCGT
-    StorageUnit:
-    - battery
-    Store: []
-  max_hours:
-    battery: 6
-  powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030
-    or DateIn != DateIn)
-  custom_powerplants: replace
-  estimate_renewable_capacities:
-    stats: irena
-    year: 2023
+  scale: 2.07
+electricity: {}
 lines:
   s_max_pu: 1.0
   custom_line_types: data/line_types.csv
@@ -167,25 +137,14 @@ lines:
     330.0: ACSR Zebra 2-bundle 330.0
 costs:
   year: 2030
-  discountrate_groups:
-    renewable:
-      rate: 0.1379
-      carriers:
-      - solar-rooftop
-      - solar-utility
-      - onwind
-      - hydro
-    fossil:
-      rate: 0.1468
-      carriers:
-      - OCGT
-      - CCGT
+  discountrate:
+  - 0.1
   marginal_cost:
     solar: 0
     onwind: 0
     offwind: 0.015
     hydro: 1.05
-    coal: 72.92
+    coal: 72.9
     ror: 0
     oil: 4.23
     geothermal: 0.87
@@ -207,3 +166,6 @@ solving:
 validation:
   interconnectors:
     enable: false
+co2:
+  limit: 8800000.0
+  base: 0.0

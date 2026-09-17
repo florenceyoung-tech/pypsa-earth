@@ -101,12 +101,6 @@ renewable:
       orientation: latitude_optimal
     capacity_per_sqkm: 4.6
     correction_factor: 1.0
-    # Modelled national mean CF is 0.179 against a
-    # 0.18 benchmark, with 0.195 north and 0.148 south against a PVsyst range of
-    # roughly 0.20 and 0.16. Gradient and levels both hold, so no correction is
-    # applied. Seasonal check shows no Harmattan dip in the north, consistent
-    # with ERA5 aerosol underrepresentation: noted as a limitation.
-    
     copernicus:
       grid_codes: [20, 30, 40, 50, 60, 90, 100]
     natura: true
@@ -129,7 +123,7 @@ renewable:
     normalization:
       method: eia
       year: 2023               # set to the latest year with data for Nigeria
-    multiplier: 1.214
+    multiplier: 1.268    # TCN 10.474 / model 8.26 = 1.268
     hydro_min_inflow_pu: 1.0
     # Capacity and location for Kainji, Jebba, Shiroro come from
     # data/custom_powerplants.csv. This block supplies only the hourly inflow
@@ -144,7 +138,7 @@ renewable:
 clustering:
   exclude_carriers: [oil, gas, coal]
   remove_stubs: true
-  p_threshold_drop_isolated: 5000 #drops the isolated NG1 subnetwork(~290 MW mean, no generation, no line, shed every hour)
+  p_threshold_drop_isolated: 100 #check drops the isolated NG1 subnetwork(~290 MW mean, no generation, no line, shed every hour)
   simplify_network:
     algorithm: kmeans
     feature: solar+onwind-time
@@ -173,7 +167,7 @@ load_options:
   source: "demcast"
   weather_year: 2024
   prediction_year: 2030
-  scale: 1                   # PLACEHOLDER, recompute per note above
+  scale: 1                  
 
 # --- CONVENTIONAL PLANT AVAILABILITY ------------------------------------------
 # Without these the model runs CCGT at ~80% capacity factor and never dispatches
@@ -261,15 +255,14 @@ costs:
 
 solving:
   options:
-    load_shedding: 100
+    load_shedding: 0.32 # EUR/kWh; central estimate of Nigerian diesel self-generation
   solver:
     name: gurobi
     options: gurobi-default
 
 # --- VALIDATION --------------------------------------------------------------
 # Interconnectors off. Nigeria exports to Niger, Benin and Togo via WAPP, but
-#   modelling that needs extra countries, links and substations CSVs. Revisit
-#   when the WAPP regional work begins.
+#   modelling that needs extra countries, links and substations CSVs. 
 
 validation:
   interconnectors:
