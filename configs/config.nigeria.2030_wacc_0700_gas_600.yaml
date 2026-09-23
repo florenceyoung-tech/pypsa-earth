@@ -36,7 +36,7 @@ costs:
       - solar-utility
       - onwind
       - hydro
-      rate: 0.1379
+      rate: 0.07
   marginal_cost:
     CCGT: 5.14
     OCGT: 8.04
@@ -183,7 +183,7 @@ renewable:
       orientation: latitude_optimal
       panel: CSi
 run:
-  name: nigeria_2030_wacc_1379_gas_600
+  name: nigeria_2030_wacc_0700_gas_600
 scenario:
   clusters:
   - 10
