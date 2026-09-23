@@ -38,8 +38,8 @@ costs:
       - hydro
       rate: 0.13
   marginal_cost:
-    CCGT: 4.95
-    OCGT: 4.35
+    CCGT: 4.15
+    OCGT: 6.18
     biomass: 4.14
     coal: 72.9
     csp: 0.0
@@ -85,6 +85,9 @@ electricity:
   voltages:
   - 132.0
   - 330.0
+  conventional_efficiency:
+    CCGT: 0.58
+    OCGT: 0.31
 enable:
   build_cutout: false
   build_natura_raster: true

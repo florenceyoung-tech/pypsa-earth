@@ -160,6 +160,9 @@ electricity:
   estimate_renewable_capacities:
     stats: irena
     year: 2023
+  conventional_efficiency:
+    CCGT: 0.58
+    OCGT: 0.31
 lines:
   s_max_pu: 1.0
   custom_line_types: data/line_types.csv
@@ -192,12 +195,8 @@ costs:
     biomass: 4.14
     nuclear: 3.46
     csp: 0.0
-# OCGT/CCGT marginal cost = VOM (OCGT 3.00, CCGT 4.00 EUR/MWh)
-# + delivered gas cost (NMDPRA regulated $2.18/MMBtu + transport to $2.50/MMBtu)
-# converted to 0.552 EUR/MWh_th at 0.293071 MWh/MMBtu and 0.7532 EUR/USD
-# divided by thermal efficiency (OCGT 0.41, CCGT 0.58)
-    OCGT: 4.35
-    CCGT: 4.95
+    OCGT: 6.18
+    CCGT: 4.15
 solving:
   options:
     load_shedding: 1.0
