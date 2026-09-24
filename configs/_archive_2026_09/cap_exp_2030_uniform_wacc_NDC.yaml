@@ -1,5 +1,5 @@
 run:
-  name: cap_exp_2030_split_wacc_NDC
+  name: cap_exp_2030_uniform_wacc_NDC
 countries:
 - NG
 scenario:
@@ -108,13 +108,13 @@ renewable:
     normalization:
       method: eia
       year: 2023
-    multiplier: 1.21
+    multiplier: 1.27
     hydro_min_inflow_pu: 1.0
 conventional:
   CCGT:
-    p_max_pu: 0.306
+    p_max_pu: 1.0
   OCGT:
-    p_max_pu: 0.217
+    p_max_pu: 1.0
 clustering:
   exclude_carriers:
   - oil
@@ -140,19 +140,8 @@ lines:
     330.0: ACSR Zebra 2-bundle 330.0
 costs:
   year: 2030
-  discountrate_groups:
-    renewable:
-      rate: 0.138
-      carriers:
-      - solar-rooftop
-      - solar-utility
-      - onwind
-      - hydro
-    fossil:
-      rate: 0.147
-      carriers:
-      - OCGT
-      - CCGT
+  discountrate:
+  - 0.1
   marginal_cost:
     solar: 0
     onwind: 0

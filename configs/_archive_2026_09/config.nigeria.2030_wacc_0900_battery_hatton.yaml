@@ -20,28 +20,45 @@ clustering:
   remove_stubs: true
 conventional:
   CCGT:
-    p_max_pu: 0.306
+    p_max_pu: 1.0
   OCGT:
-    p_max_pu: 0.217
+    p_max_pu: 1.0
 costs:
   discountrate_groups:
-    fossil:
-      carriers:
-      - OCGT
-      - CCGT
-      rate: 0.147
-    renewable:
+    solar:
+      rate: 0.09
       carriers:
       - solar-rooftop
       - solar-utility
+    wind:
+      rate: 0.09
+      carriers:
       - onwind
+    battery:
+      rate: 0.1468
+      carriers:
+      - battery
+    hydro:
+      rate: 0.1379
+      carriers:
       - hydro
-      rate: 0.13
+      - ror
+      - PHS
+    gas:
+      rate: 0.1468
+      carriers:
+      - OCGT
+      - CCGT
+    biofuel:
+      rate: 0.1379
+      carriers:
+      - biomass
+      - oil
   marginal_cost:
     CCGT: 4.15
     OCGT: 6.18
     biomass: 4.14
-    coal: 72.9
+    coal: 72.92
     csp: 0.0
     geothermal: 0.87
     hydro: 1.05
@@ -105,7 +122,7 @@ lines:
   s_max_pu: 1.0
 load_options:
   prediction_year: 2030
-  scale: 2.07
+  scale: 2.074
   source: demcast
   weather_year: 2024
 renewable:
@@ -121,7 +138,7 @@ renewable:
     hydro_max_hours_default: 6.0
     hydro_min_inflow_pu: 1.0
     hydrobasins_level: 6
-    multiplier: 1.21
+    multiplier: 1.214
     normalization:
       method: eia
       year: 2023
@@ -183,7 +200,7 @@ renewable:
       orientation: latitude_optimal
       panel: CSi
 run:
-  name: nigeria_2030_wacc_1300_ndc
+  name: nigeria_2030_wacc_0900_battery_hatton
 scenario:
   clusters:
   - 10
@@ -199,13 +216,10 @@ snapshots:
   start: '2024-01-01'
 solving:
   options:
-    load_shedding: 1.0
+    load_shedding: 1
   solver:
     name: gurobi
     options: gurobi-default
 validation:
   interconnectors:
     enable: false
-co2:
-  limit: 8800000.0
-  base: 0.0

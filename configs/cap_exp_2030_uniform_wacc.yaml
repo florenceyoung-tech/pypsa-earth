@@ -112,9 +112,9 @@ renewable:
     hydro_min_inflow_pu: 1.0
 conventional:
   CCGT:
-    p_max_pu: 0.306
+    p_max_pu: 1.0
   OCGT:
-    p_max_pu: 0.217
+    p_max_pu: 1.0
 clustering:
   exclude_carriers:
   - oil

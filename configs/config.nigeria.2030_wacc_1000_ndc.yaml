@@ -20,9 +20,9 @@ clustering:
   remove_stubs: true
 conventional:
   CCGT:
-    p_max_pu: 0.306
+    p_max_pu: 1.0
   OCGT:
-    p_max_pu: 0.217
+    p_max_pu: 1.0
 costs:
   discountrate_groups:
     fossil:
@@ -36,7 +36,7 @@ costs:
       - solar-utility
       - onwind
       - hydro
-      rate: 0.07
+      rate: 0.1
   marginal_cost:
     CCGT: 4.15
     OCGT: 6.18
@@ -183,7 +183,7 @@ renewable:
       orientation: latitude_optimal
       panel: CSi
 run:
-  name: nigeria_2030_wacc_0700_ndc
+  name: nigeria_2030_wacc_1000_ndc
 scenario:
   clusters:
   - 10
