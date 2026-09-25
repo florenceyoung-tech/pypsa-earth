@@ -1,5 +1,4 @@
 technology,year,parameter,value,unit,source,further description,currency_year
-solar-rooftop,2030,discount rate,0.04,per unit,standard for decentral,,
 onwind,2030,lifetime,30.0,years,DEA https://ens.dk/en/our-services/projections-and-models/technology-data,,
 offwind,2030,lifetime,30.0,years,DEA https://ens.dk/en/our-services/projections-and-models/technology-data,,
 solar,2030,lifetime,25.0,years,IEA2010,,
@@ -202,3 +201,15 @@ csp-tower TES,2030,lifetime,30.0,years,see solar-tower.,,
 csp-tower power block,2030,FOM,1.1,%/year,see solar-tower.,,2013.0
 csp-tower power block,2030,investment,759.17,EUR/kW_e,ATB CSP data (https://atb.nrel.gov/electricity/2021/concentrating_solar_power) and NREL SAM v2021.12.2 (https://sam.nrel.gov/).,,2013.0
 csp-tower power block,2030,lifetime,30.0,years,see solar-tower.,,
+solar,2030,discount rate,0.1379,per unit,author set,split WACC scenario,2013.0
+solar-utility,2030,discount rate,0.1379,per unit,author set,split WACC scenario,2013.0
+solar-rooftop,2030,discount rate,0.1379,per unit,author set,split WACC scenario,2013.0
+onwind,2030,discount rate,0.1379,per unit,author set,split WACC scenario,2013.0
+offwind,2030,discount rate,0.1379,per unit,author set,split WACC scenario,2013.0
+hydro,2030,discount rate,0.1379,per unit,author set,split WACC scenario,2013.0
+ror,2030,discount rate,0.1379,per unit,author set,split WACC scenario,2013.0
+PHS,2030,discount rate,0.1379,per unit,author set,split WACC scenario,2013.0
+battery inverter,2030,discount rate,0.1379,per unit,author set,split WACC scenario,2013.0
+battery storage,2030,discount rate,0.1379,per unit,author set,split WACC scenario,2013.0
+OCGT,2030,discount rate,0.1468,per unit,author set,split WACC scenario,2013.0
+CCGT,2030,discount rate,0.1468,per unit,author set,split WACC scenario,2013.0

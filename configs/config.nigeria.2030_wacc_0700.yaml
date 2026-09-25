@@ -24,42 +24,35 @@ conventional:
   OCGT:
     p_max_pu: 0.217
 costs:
-  discountrate_groups:
-    battery:
-      carriers:
-      - battery
-      rate: 0.07
-    fossil:
-      carriers:
-      - OCGT
-      - CCGT
-      rate: 0.1468
-    hydro:
-      carriers:
-      - hydro
-      - ror
-      - PHS
-      rate: 0.07
-    renewable:
-      carriers:
-      - solar
-      - onwind
-      rate: 0.07
-  marginal_cost:
-    CCGT: 4.49
-    OCGT: 5.6
-    biomass: 4.14
-    coal: 72.92
-    csp: 0.0
-    geothermal: 0.87
-    hydro: 1.05
-    nuclear: 3.46
-    offwind: 0.015
-    oil: 4.23
-    onwind: 0
-    ror: 0
-    solar: 0
   year: 2030
+  discountrate: [0.07]
+  discountrate_groups:
+    renewable:
+      rate: 0.07
+      carriers: [solar, solar-utility, solar-rooftop, onwind]
+    hydro:
+      rate: 0.07
+      carriers: [hydro, ror, PHS]
+    battery:
+      rate: 0.07
+      carriers: [battery storage, battery inverter]
+    fossil:
+      rate: 0.1468
+      carriers: [OCGT, CCGT]
+  marginal_cost:
+    solar: 0
+    onwind: 0
+    offwind: 0.015
+    hydro: 1.05
+    coal: 72.92
+    ror: 0
+    oil: 4.23
+    geothermal: 0.87
+    biomass: 4.14
+    nuclear: 3.46
+    csp: 0.0
+    OCGT: 5.59
+    CCGT: 4.49
 countries:
 - NG
 electricity:
