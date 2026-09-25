@@ -20,28 +20,36 @@ clustering:
   remove_stubs: true
 conventional:
   CCGT:
-    p_max_pu: 1.0
+    p_max_pu: 0.306
   OCGT:
-    p_max_pu: 1.0
+    p_max_pu: 0.217
 costs:
   discountrate_groups:
+    battery:
+      carriers:
+      - battery
+      rate: 0.1379
     fossil:
       carriers:
       - OCGT
       - CCGT
-      rate: 0.147
+      rate: 0.1468
+    hydro:
+      carriers:
+      - hydro
+      - ror
+      - PHS
+      rate: 0.1379
     renewable:
       carriers:
-      - solar-rooftop
-      - solar-utility
+      - solar
       - onwind
-      - hydro
-      rate: 0.138
+      rate: 0.1379
   marginal_cost:
-    CCGT: 4.15
-    OCGT: 6.18
+    CCGT: 5.29
+    OCGT: 4.82
     biomass: 4.14
-    coal: 72.9
+    coal: 72.92
     csp: 0.0
     geothermal: 0.87
     hydro: 1.05
@@ -61,6 +69,9 @@ electricity:
   - OCGT
   - CCGT
   - biomass
+  conventional_efficiency:
+    CCGT: 0.58
+    OCGT: 0.41
   custom_powerplants: replace
   estimate_renewable_capacities:
     stats: irena
@@ -85,9 +96,6 @@ electricity:
   voltages:
   - 132.0
   - 330.0
-  conventional_efficiency:
-    CCGT: 0.58
-    OCGT: 0.31
 enable:
   build_cutout: false
   build_natura_raster: true
@@ -105,7 +113,7 @@ lines:
   s_max_pu: 1.0
 load_options:
   prediction_year: 2030
-  scale: 2.07
+  scale: 2.074
   source: demcast
   weather_year: 2024
 renewable:
@@ -121,7 +129,7 @@ renewable:
     hydro_max_hours_default: 6.0
     hydro_min_inflow_pu: 1.0
     hydrobasins_level: 6
-    multiplier: 1.21
+    multiplier: 1.268
     normalization:
       method: eia
       year: 2023
