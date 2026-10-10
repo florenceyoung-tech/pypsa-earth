@@ -553,6 +553,7 @@ def add_battery_constraints(n):
     n.model.add_constraints(lhs == 0, name="Link-charger_ratio")
 
 
+
 def add_RES_constraints(n, res_share, config):
     """
     The constraint ensures that a predefined share of power is generated

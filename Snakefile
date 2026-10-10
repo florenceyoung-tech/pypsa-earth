@@ -39,7 +39,6 @@ copy_default_files()
 configfile: "config.default.yaml"
 configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
-configfile: "configs/cap_exp_2030_split_wacc.yaml"
 
 
 
@@ -1004,11 +1003,13 @@ def memory(w):
         return int(factor * (10000 + 195 * int(w.clusters)))
 
 if config["co2"].get("limit"):
+
     rule add_co2_constraint:
         params:
             co2_limit=config["co2"]["limit"],
         input:
             network="networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
+            costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
         output:
             network="networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_withco2.nc",
         log:
@@ -1024,8 +1025,12 @@ if config["monte_carlo"]["options"].get("add_to_snakefile", False) == False:
             augmented_line_connection=config["augmented_line_connection"],
             policy_config=config["policy_config"],
         input:
-            network="networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_withco2.nc",
-            agg_p_nom_minmax=config["electricity"]["agg_p_nom_limits"]["file"],  # ensure the CSV with capacity constraints is copied into the shadow directory (needed on Windows, since shadowed scripts can’t access files outside `input`)
+            network=branch(
+                config["co2"].get("limit"),
+                "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_withco2.nc",
+                "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
+            ),
+            agg_p_nom_minmax=config["electricity"]["agg_p_nom_limits"]["file"],
         output:
             "results/" + RDIR + "networks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
         log:

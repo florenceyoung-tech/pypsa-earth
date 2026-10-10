@@ -1,0 +1,40 @@
+S6 lowest tested WACC (%)                          7.0
+S6 highest tested WACC (%)                         27.0
+S6 threshold WACC to hit 30% target (%)            none in tested range
+S6 renewable share at lowest WACC (%)              28.9
+S6 renewable share at highest WACC (%)             18.6
+S6 solar GW at lowest WACC                         10.35
+S6 solar GW at highest WACC                        4.9
+S6 solar change lowest to highest (%)              -52.7
+S6 solar lost per 1 pp of WACC (GW)                0.24
+S6 gas GW at lowest / highest WACC                 30.6 / 35.0
+S6 emissions Mt at lowest / highest WACC           25.5 / 29.3
+S6 renewable share at 10% (common model assumption) (%) 26.3
+S6 solar GW at 10% (common model assumption)       8.94
+S6 renewable share at Hatton 13.79% (%)            24.9
+S6 solar GW at Hatton 13.79%                       8.17
+S6 renewable share at Observed 27% (%)             18.6
+S6 solar GW at Observed 27%                        4.9
+S7 gas price change tested                         3.39 to 27.00 USD/MMBtu (+696%)
+S7 solar added by higher gas price (GW)            0.93
+S7 renewable share added by gas price (pp)         2.1
+S7 system cost added by gas price (USD/MWh)        10.67
+S7 solar added by WACC 27 to 13.79 (GW)            3.27
+S7 renewable share added by WACC 27 to 13.79 (pp)  6.3
+S8 LCOE crossover WACC (%)                         17.16
+S8 system threshold WACC (%)                       none in tested range
+S9 NDC solar GW range                              30.9 to 31.6
+S9 NDC battery GW range                            8.8 to 11.0
+S9 NDC cost at lowest WACC (USD/MWh)               48.5 at 10.0%
+S9 NDC cost at highest WACC (USD/MWh)              105.6 at 27.0%
+S9 cost multiple highest vs lowest WACC            2.18
+S9 premium at 10.0% (USD/MWh)                      10.7
+S9 carbon price at 10.0% (USD/t)                   47.1
+S9 premium at 13.79% (USD/MWh)                     20.69
+S9 carbon price at 13.79% (USD/t)                  88.5
+S9 premium at 27.0% (USD/MWh)                      57.06
+S9 carbon price at 27.0% (USD/t)                   216.1
+S10 instruments combined (pp)                      9 to 14
+S10 gap Hatton 13.79% to 10% (common model assumption) (pp) 3.79  (within reach)
+S10 gap Observed 27% to Hatton 13.79% (pp)         13.21  (only if all instruments work at their best)
+S10 gap Observed 27% to 10% (common model assumption) (pp) 17.00  (out of reach)

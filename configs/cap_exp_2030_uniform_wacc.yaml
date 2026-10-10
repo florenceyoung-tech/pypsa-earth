@@ -16,7 +16,7 @@ enable:
   download_osm_data: true
   retrieve_cutout: false
   build_cutout: false
-  retrieve_cost_data: true
+  retrieve_cost_data: false
   retrieve_databundle_sector: false
   download_global_buildings: false
   build_natura_raster: true
@@ -134,7 +134,7 @@ costs:
     biomass: 4.14
     nuclear: 3.46
     csp: 0.0
-    CGT: 5.59                     # 3.77 + 0.748/0.41
+    OCGT: 5.59                     # 3.77 + 0.748/0.41
     CCGT: 4.49                     # 3.20 + 0.748/0.58
 solving:
   options:
