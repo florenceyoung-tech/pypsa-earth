@@ -362,7 +362,7 @@ if __name__ == "__main__":
     opts = snakemake.wildcards.opts.split("-")
 
     n = pypsa.Network(snakemake.input[0])
-    Nyears = n.snapshot_weightings.objective.sum() / 8760.0
+    Nyears = n.snapshot_weightings.objective.sum() / float(snakemake.config["costs"].get("reference_year_hours", 8760.0))
     costs = pd.read_csv(snakemake.input.tech_costs, index_col=0)
 
     # custom line types don't survive simplify_network/cluster_network's
@@ -484,6 +484,67 @@ if __name__ == "__main__":
             home_countries=snakemake.params.countries,
             distance_crs=snakemake.config["crs"]["distance_crs"],
         )
+    # -----------------------------------------------------------------
+    # Brownfield split: separate existing conventional assets from new build.
+    #
+    # PyPSA does not support endogenous retirement of extendable assets
+    # (p_nom_opt < p_nom). If p_nom_min is set to 0 on an asset that already
+    # has p_nom > 0, the LP can produce degenerate greenfield solutions.
+    #
+    # The clean approach (following PyPSA-Eur's add_brownfield.py) is to
+    # freeze the existing asset at its current p_nom and add a new
+    # extendable asset starting from 0. The optimiser then decides how
+    # much NEW capacity to build, while the existing fleet stays online.
+    #
+    # Controlled by electricity.split_existing: true in the scenario YAML.
+    # -----------------------------------------------------------------
+    if snakemake.config.get("electricity", {}).get("split_existing", False):
 
+        EXISTING_CARRIERS = {"CCGT", "OCGT", "oil", "coal", "biomass"}
+        to_split = n.generators.query(
+            "carrier in @EXISTING_CARRIERS and p_nom > 0 and p_nom_extendable"
+        ).index
+
+        logger.info(
+            f"split_existing=True: splitting {len(to_split)} existing "
+            f"conventional generators into fixed + new-extendable."
+        )
+
+        new_rows = {}
+        for idx in to_split:
+            row = n.generators.loc[idx].copy()
+
+            # 1. Freeze the existing asset at its current p_nom
+            n.generators.at[idx, "p_nom_extendable"] = False
+            n.generators.at[idx, "p_nom_min"] = n.generators.at[idx, "p_nom"]
+            n.generators.at[idx, "p_nom_max"] = n.generators.at[idx, "p_nom"]
+
+            # 2. Prepare a duplicate asset that starts from zero
+            new_idx = f"{idx} new"
+            new_row = row.copy()
+            new_row["p_nom"] = 0.0
+            new_row["p_nom_min"] = 0.0
+            new_row["p_nom_max"] = float("inf")
+            new_row["p_nom_extendable"] = True
+            new_rows[new_idx] = new_row
+
+        # 3. Add all new assets at once (PyPSA add with a DataFrame)
+        if new_rows:
+            new_df = pd.DataFrame.from_dict(new_rows, orient="index")
+            # Drop time-varying columns (they stay on the original asset);
+            # PyPSA will treat them as static for the new asset.
+            time_cols = [
+                c for c in new_df.columns
+                if c in n.generators_t.p_max_pu.columns
+                or c in n.generators_t.p_min_pu.columns
+            ]
+            new_df = new_df.drop(columns=time_cols, errors="ignore")
+            n.import_components_from_dataframe(new_df, "Generator")
+            logger.info(f"Added {len(new_rows)} new-extendable generators.")
+
+    from nigeria_consistency import apply_nigeria_assumptions
+    audit = apply_nigeria_assumptions(n, snakemake.config, costs)
     n.meta = dict(snakemake.config, **dict(wildcards=dict(snakemake.wildcards)))
+    if audit:
+        n.meta["nigeria_audit"] = audit
     n.export_to_netcdf(snakemake.output[0])

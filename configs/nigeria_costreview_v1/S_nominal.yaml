@@ -1,0 +1,279 @@
+run:
+  name: nigeria_costreview_v1_S_nominal
+countries:
+- NG
+scenario:
+  simpl:
+  - ''
+  ll:
+  - copt
+  clusters:
+  - 10
+  opts:
+  - 1h
+snapshots:
+  start: '2024-01-01'
+  end: '2025-01-01'
+  inclusive: left
+enable:
+  retrieve_databundle: false
+  download_osm_data: true
+  retrieve_cutout: false
+  build_cutout: false
+  retrieve_cost_data: false
+  retrieve_databundle_sector: false
+  download_global_buildings: false
+  build_natura_raster: true
+  progress_bar: true
+atlite:
+  nprocesses: 4
+  cutouts:
+    cutout-2024-era5:
+      module: era5
+      dx: 0.3
+      dy: 0.3
+      time:
+      - '2024-01-01'
+      - '2025-01-01'
+  default: cutout-2024-era5
+renewable:
+  onwind:
+    cutout: auto
+    resource:
+      method: wind
+      turbine: Vestas_V112_3MW
+    capacity_per_sqkm: 3
+    copernicus:
+      grid_codes:
+      - 20
+      - 30
+      - 40
+      - 60
+      - 100
+      - 111
+      - 112
+      - 113
+      - 114
+      - 115
+      - 116
+      - 121
+      - 122
+      - 123
+      - 124
+      - 125
+      - 126
+      distance: 1000
+      distance_grid_codes:
+      - 50
+    natura: true
+    potential: simple
+    clip_p_max_pu: 0.01
+    extendable: true
+  solar:
+    cutout: auto
+    resource:
+      method: pv
+      panel: CSi
+      orientation: latitude_optimal
+    capacity_per_sqkm: 4.6
+    correction_factor: 1.0
+    copernicus:
+      grid_codes:
+      - 20
+      - 30
+      - 40
+      - 50
+      - 60
+      - 90
+      - 100
+    natura: true
+    potential: simple
+    clip_p_max_pu: 0.01
+    extendable: true
+  hydro:
+    cutout: auto
+    hydrobasins_level: 6
+    resource:
+      method: hydro
+      hydrobasins: data/hydrobasins/hybas_world.shp
+      flowspeed: 1.0
+    carriers:
+    - ror
+    - hydro
+    - PHS
+    hydro_max_hours: energy_capacity_totals_by_country
+    hydro_max_hours_default: 6.0
+    clip_min_inflow: 1.0
+    extendable: false
+    normalization:
+      method: eia
+      year: 2023
+    multiplier: 1.268
+    hydro_min_inflow_pu: 1.0
+conventional:
+  CCGT:
+    p_max_pu: 0.306
+  OCGT:
+    p_max_pu: 0.217
+clustering:
+  exclude_carriers:
+  - oil
+  - gas
+  - coal
+  remove_stubs: true
+  p_threshold_drop_isolated: 100
+base_network:
+  min_voltage_rebase_voltage: 330000
+load_options:
+  source: demcast
+  weather_year: 2024
+  prediction_year: 2030
+  scale: 1.0
+electricity:
+  base_voltage: 330.0
+  voltages:
+  - 132.0
+  - 330.0
+  renewable_carriers:
+  - solar
+  - onwind
+  - hydro
+  conventional_carriers:
+  - oil
+  - OCGT
+  - CCGT
+  - biomass
+  extendable_carriers:
+    Generator:
+    - solar
+    - onwind
+    - OCGT
+    - CCGT
+    StorageUnit:
+    - battery
+    Store: []
+  max_hours:
+    battery: 6
+  powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030
+    or DateIn != DateIn)
+  custom_powerplants: replace
+  estimate_renewable_capacities:
+    stats: irena
+    year: 2023
+  split_existing: true
+lines:
+  s_max_pu: 1.0
+  custom_line_types: data/line_types.csv
+  ac_types:
+    330.0: ACSR Zebra 2-bundle 330.0
+costs:
+  year: 2030
+  discountrate:
+  - 0.1
+  discountrate_groups:
+    renewable:
+      rate: 0.1379
+      carriers:
+      - solar
+      - solar-utility
+      - onwind
+    hydro:
+      rate: 0.1379
+      carriers:
+      - hydro
+      - ror
+      - PHS
+    battery:
+      rate: 0.1379
+      carriers:
+      - battery storage
+      - battery inverter
+    fossil:
+      rate: 0.1468
+      carriers:
+      - OCGT
+      - CCGT
+    transmission:
+      rate: 0.1468
+      carriers:
+      - HVAC overhead
+      - HVDC overhead
+      - HVDC submarine
+      - HVDC inverter pair
+  input_file: data/nigeria_study/costreview_v1/costs_revised.csv
+  output_currency: USD
+  price_year: 2024
+  exchange_rates:
+    USD: 1.0
+    EUR: 1.0824
+  reference_year_hours: 8760
+  price_year_factors:
+    EUR:
+      2013: 1.2685380823020425
+  price_year_factor_source: Eurostat prc_hicp_aind; EA20 CP00 INX_A_AVG; 2013=99.39,
+    2024=126.08; general-price proxy
+  included_technologies:
+  - onwind
+  - solar
+  - solar-utility
+  - hydro
+  - ror
+  - PHS
+  - OCGT
+  - CCGT
+  - gas
+  - oil
+  - biomass
+  - coal
+  - battery inverter
+  - battery storage
+  - HVAC overhead
+  - HVDC overhead
+  - HVDC submarine
+  - HVDC inverter pair
+  rooftop_share: 0.0
+  efficiency:
+    CCGT: 0.53
+    OCGT: 0.37
+  fuel:
+    gas: 10.865306685180055
+  marginal_cost:
+    solar: 0.01
+    onwind: 0.015
+solving:
+  options:
+    load_shedding: 10.0
+    noisy_costs: false
+  solver:
+    name: gurobi
+    options: gurobi-default
+validation:
+  interconnectors:
+    enable: false
+co2:
+  limit: null
+  base: 0.0
+nigeria_study:
+  enabled: true
+  scenario: S_nominal
+  group: sensitivity
+  inflation_assumption: 0.02
+  rate_basis: nominal_stress
+  nominal_renewable_wacc: 0.1379
+  nominal_battery_wacc: 0.1379
+  nominal_gas_wacc: 0.1468
+  gas_usd_per_mmbtu: 3.39
+  gas_quote_price_year: 2026
+  gas_real_2024_usd_per_mwh: 10.865306685180055
+  preserve_existing_renewables: true
+  annual_demand_twh: 78.0
+  max_excluded_load_share: 0.1
+  existing_gas_derating:
+    CCGT: 0.306
+    OCGT: 0.217
+  new_gas_availability: 1.0
+  boundary: largest_connected_component_rescaled_to_national_demand
+  co2_cap_basis: analytical allocation; 2018 grid baseline 12.4 Mt remains to be sourced
+  cost_data_revision: nigeria_costreview_v1
+  gas_quote_period: June 2026
+  cost_source_sha256: 01ef8fd257b5280c6252fbbffd18260187a6001760b7b05dcf9d07feaa514b68

@@ -353,21 +353,30 @@ def load_costs(
     """
     costs = pd.read_csv(tech_costs, index_col=["technology", "parameter"]).sort_index()
 
+    included = config.get("included_technologies")
+    if included:
+        costs = costs.loc[costs.index.get_level_values("technology").isin(included)].copy()
+        logger.info("Processing only configured electricity technologies: %s", included)
+
     # correct units to MW and output_currency
     costs.loc[costs.unit.str.contains("/kW"), "value"] *= 1e3
     costs.unit = costs.unit.str.replace("/kW", "/MW")
-    _currency_conversion_cache = build_currency_conversion_cache(
-        costs,
-        output_currency=config["output_currency"],
-        default_exchange_rate=config["default_exchange_rate"],
-        future_exchange_rate_strategy=config.get("future_exchange_rate_strategy"),
-        custom_future_exchange_rate=config.get("custom_future_rate", None),
-    )
-    costs = apply_currency_conversion(
-        costs,
-        config["output_currency"],
-        _currency_conversion_cache,
-    )
+    if config.get("exchange_rates"):
+        from nigeria_consistency import convert_explicit_currency
+        costs = convert_explicit_currency(costs, config)
+    else:
+        _currency_conversion_cache = build_currency_conversion_cache(
+            costs,
+            output_currency=config["output_currency"],
+            default_exchange_rate=config["default_exchange_rate"],
+            future_exchange_rate_strategy=config.get("future_exchange_rate_strategy"),
+            custom_future_exchange_rate=config.get("custom_future_exchange_rate", config.get("custom_future_rate")),
+        )
+        costs = apply_currency_conversion(
+            costs,
+            config["output_currency"],
+            _currency_conversion_cache,
+        )
 
     # apply filter on financial_case and scenario, if they are contained in the cost dataframe
     wished_cost_scenario = config["cost_scenario"]
@@ -394,6 +403,8 @@ def load_costs(
         overwrites = config.get(attr)
         if overwrites is not None:
             overwrites = pd.Series(overwrites)
+            if included:
+                overwrites = overwrites.loc[overwrites.index.intersection(costs.index)]
             costs.loc[overwrites.index, attr] = overwrites
             logger.info(
                 f"Overwriting {attr} of {overwrites.index} to {overwrites.values}"
@@ -435,11 +446,15 @@ def load_costs(
     costs.at["OCGT", "co2_emissions"] = costs.at["gas", "co2_emissions"]
     costs.at["CCGT", "co2_emissions"] = costs.at["gas", "co2_emissions"]
 
-    costs.at["solar", "capital_cost"] = (
-        config["rooftop_share"] * costs.at["solar-rooftop", "capital_cost"]
-        + (1 - config["rooftop_share"]) * costs.at["solar-utility", "capital_cost"]
-    )
-    costs.loc["csp"] = costs.loc["csp-tower"]
+    if config["rooftop_share"] == 0:
+        costs.at["solar", "capital_cost"] = costs.at["solar-utility", "capital_cost"]
+    else:
+        costs.at["solar", "capital_cost"] = (
+            config["rooftop_share"] * costs.at["solar-rooftop", "capital_cost"]
+            + (1 - config["rooftop_share"]) * costs.at["solar-utility", "capital_cost"]
+        )
+    if "csp-tower" in costs.index:
+        costs.loc["csp"] = costs.loc["csp-tower"]
 
     def costs_for_storage(store, link1, link2=None, max_hours=1.0):
         capital_cost = link1["capital_cost"] + max_hours * store["capital_cost"]
@@ -454,17 +469,18 @@ def load_costs(
         costs.loc["battery inverter"],
         max_hours=max_hours["battery"],
     )
-    costs.loc["H2"] = costs_for_storage(
-        costs.loc["hydrogen storage tank"],
-        costs.loc["fuel cell"],
-        costs.loc["electrolysis"],
-        max_hours=max_hours["H2"],
-    )
+    if {"hydrogen storage tank", "fuel cell", "electrolysis"}.issubset(costs.index):
+        costs.loc["H2"] = costs_for_storage(
+            costs.loc["hydrogen storage tank"], costs.loc["fuel cell"],
+            costs.loc["electrolysis"], max_hours=max_hours["H2"],
+        )
 
     for attr in ("marginal_cost", "capital_cost"):
         overwrites = config.get(attr)
         if overwrites is not None:
             overwrites = pd.Series(overwrites)
+            if included:
+                overwrites = overwrites.loc[overwrites.index.intersection(costs.index)]
             costs.loc[overwrites.index, attr] = overwrites
             logger.info(
                 f"Overwriting {attr} of {overwrites.index} to {overwrites.values}"
@@ -605,7 +621,7 @@ if __name__ == "__main__":
         snakemake = mock_snakemake("process_cost_data", scope="sec")
 
     n = pypsa.Network(snakemake.input.network)
-    Nyears = n.snapshot_weightings.generators.sum() / 8760.0
+    Nyears = n.snapshot_weightings.generators.sum() / float(snakemake.params.costs.get("reference_year_hours", 8760.0))
 
     if snakemake.wildcards.scope == "elec":
         costs = load_costs(

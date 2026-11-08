@@ -1,0 +1,51 @@
+{
+  "revision": "nigeria_final_v1",
+  "target_currency": "USD",
+  "target_price_year": 2024,
+  "cpi_series": "BLS CUUR0000SA0 CPI-U US city average all items not seasonally adjusted",
+  "cpi_url": "https://www.bls.gov/regions/northeast/data/consumerpriceindex_us_table.htm",
+  "cpi_values": {
+    "2024_annual": 313.689,
+    "2025_annual": 321.943,
+    "2026_June": 333.952,
+    "2026_July": 333.918
+  },
+  "factors": {
+    "IRENA_2025_to_2024": 0.9743619212096553,
+    "Lazard_July2026_proxy_to_2024": 0.9394192586203799,
+    "NERC_June2026_to_2024": 0.9393236153698736
+  },
+  "gas_quote": {
+    "value": 3.39,
+    "unit": "USD/MMBtu",
+    "period": "June 2026",
+    "scope": "gas supply and transportation regulatory tariff assumption, not all project contracts",
+    "source": "NERC ORDER/NERC/2026/091 Table 1 p4",
+    "url": "https://nerc.gov.ng/wp-content/uploads/2026/07/IE_MYTO_JUNE_2026.pdf"
+  },
+  "battery": {
+    "benchmark_2025_usd_per_kwh": 140.4522568601,
+    "benchmark_duration_h": 4,
+    "energy_share": 0.722,
+    "power_share": 0.278,
+    "split_status": "author assumption; NREL supports method but exact shares unverified",
+    "model_duration_h": 6,
+    "energy_life_y": 15,
+    "power_life_y": 20,
+    "FOM_fraction_each_component": 0.02,
+    "explicit_augmentation": false
+  },
+  "retained_efficiencies_HHV": {
+    "CCGT": 0.53,
+    "OCGT": 0.37
+  },
+  "scope": "Historical benchmark costs held constant across finance cases; no technology learning forecast",
+  "final_decisions": {
+    "unserved_energy": "Load shedding disabled in final expansion cases; physical supply must satisfy nodal balances",
+    "matched_cap_sweep": "Add 8.8 Mt capped counterparts at renewable nominal WACC 7, 11, 17 and 20 percent; D2 supplies 13.79 percent point; gas held at 14.68 percent",
+    "cached_inputs": "Reuse only cost-independent B2 base network, plant list, demand, shapes, base bus regions and renewable profiles; rebuild all cost-dependent networks",
+    "new_gas_availability": "Keep 1.0 reference and 0.85 sensitivity; constant hourly derating, not annual capacity factor",
+    "hydro": "Retain EIA2023 normalisation and multiplier 1.268 without a second calibration factor",
+    "co2_cap_status": "Analytical allocation; 12.4 Mt grid baseline remains unverified; not an official sectoral target"
+  }
+}

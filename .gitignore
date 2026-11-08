@@ -77,3 +77,8 @@ screenlog*
 !data/demand/unsd/paths/Energy_Statistics_Database.xlsx
 site/
 !data/industry/ammonia_plants.csv
+
+# Local Mac metadata and backup files
+.DS_Store
+*.bak
+backup_nigeria_*/

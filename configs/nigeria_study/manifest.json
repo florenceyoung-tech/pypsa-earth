@@ -1,0 +1,218 @@
+[
+  {
+    "scenario": "B1",
+    "group": "baseline",
+    "config": "configs/nigeria_study/B1.yaml",
+    "config_sha256": "b44012915b709920b56e4b78ced69e6616cf5ad5ff68d9eac89b7f65c2cccefe",
+    "run_name": "nigeria_consistent_B1",
+    "network": "results/nigeria_consistent_B1/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "B2",
+    "group": "baseline",
+    "config": "configs/nigeria_study/B2.yaml",
+    "config_sha256": "97ee3e0e9ca6df167d07cd94ef0ef736bca5f18b3cd7c1cccfabfc36c654530d",
+    "run_name": "nigeria_consistent_B2",
+    "network": "results/nigeria_consistent_B2/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "B3",
+    "group": "baseline",
+    "config": "configs/nigeria_study/B3.yaml",
+    "config_sha256": "6b7fffe9c9e3da3e164c8c369620d69a6b0db89f1411a020863d0effcd3303e9",
+    "run_name": "nigeria_consistent_B3",
+    "network": "results/nigeria_consistent_B3/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C01",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C01.yaml",
+    "config_sha256": "e505fda32db0b9b1ee68592fd75192f57d4dfa205615b405c93c41fa0d1655a1",
+    "run_name": "nigeria_consistent_C01",
+    "network": "results/nigeria_consistent_C01/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C02",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C02.yaml",
+    "config_sha256": "c47c365f2e7f69197075bed92127e2bb663ca5990c4822ff0b00110c1526a4f8",
+    "run_name": "nigeria_consistent_C02",
+    "network": "results/nigeria_consistent_C02/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C03",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C03.yaml",
+    "config_sha256": "029d7e0d30a432fef828678b3b535c87e90956ffc015ba956c4f89d072c5d6f9",
+    "run_name": "nigeria_consistent_C03",
+    "network": "results/nigeria_consistent_C03/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C04",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C04.yaml",
+    "config_sha256": "838a78683a0d92136a156b6859f60424f0fa91a1f82f47fa4820db0089878465",
+    "run_name": "nigeria_consistent_C04",
+    "network": "results/nigeria_consistent_C04/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C05",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C05.yaml",
+    "config_sha256": "a24e2a1191b7dd246023bf37ac7d7af4d74bd3b806d93d49893dec7858febab1",
+    "run_name": "nigeria_consistent_C05",
+    "network": "results/nigeria_consistent_C05/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C06",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C06.yaml",
+    "config_sha256": "340e58f21b6f9395d1a3659490d80f1b13470cddb7db6fa321e5642480ed2f33",
+    "run_name": "nigeria_consistent_C06",
+    "network": "results/nigeria_consistent_C06/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C07",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C07.yaml",
+    "config_sha256": "5b2c7f8773018620b9dfc7c07049832b28d4ab5bca33df919a9c003214c46e27",
+    "run_name": "nigeria_consistent_C07",
+    "network": "results/nigeria_consistent_C07/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C08",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C08.yaml",
+    "config_sha256": "f397eaa02d3a802e956db97630dff4023396d6a76cbf50f175fbc3983b6cbd6f",
+    "run_name": "nigeria_consistent_C08",
+    "network": "results/nigeria_consistent_C08/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C09",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C09.yaml",
+    "config_sha256": "d5228f9b38c5c932b1235ecf92da3c160c95579e6e55563c7d909a66dc4693cb",
+    "run_name": "nigeria_consistent_C09",
+    "network": "results/nigeria_consistent_C09/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C10",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C10.yaml",
+    "config_sha256": "92292ace5050ca2ff1727a8c2c5485098df3a21fb6ec6560a9e0c01f95c36011",
+    "run_name": "nigeria_consistent_C10",
+    "network": "results/nigeria_consistent_C10/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "C11",
+    "group": "sweep",
+    "config": "configs/nigeria_study/C11.yaml",
+    "config_sha256": "a49515cb458fd2ce27a44dbe379bff6ec9303febc760149404626fc945511a3d",
+    "run_name": "nigeria_consistent_C11",
+    "network": "results/nigeria_consistent_C11/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "D1",
+    "group": "cap",
+    "config": "configs/nigeria_study/D1.yaml",
+    "config_sha256": "0d871662d93b9a46d810b8370a175b0771279796d1a346ce3e5401bf128c1eb4",
+    "run_name": "nigeria_consistent_D1",
+    "network": "results/nigeria_consistent_D1/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "D2",
+    "group": "cap",
+    "config": "configs/nigeria_study/D2.yaml",
+    "config_sha256": "0bad183e5354f94e8f79eab66694297e1c8da806e4bad25b754de25cb7de23cf",
+    "run_name": "nigeria_consistent_D2",
+    "network": "results/nigeria_consistent_D2/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "D3",
+    "group": "cap",
+    "config": "configs/nigeria_study/D3.yaml",
+    "config_sha256": "6159a13ef22a4af62dd31568b70d915eb05a8b6521ab9a152ac089431ed21db9",
+    "run_name": "nigeria_consistent_D3",
+    "network": "results/nigeria_consistent_D3/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "P1",
+    "group": "gas",
+    "config": "configs/nigeria_study/P1.yaml",
+    "config_sha256": "cfeea2dc8051a2c9fe5f949ec3eaf60eac8db15e53ed533f05ddab2cc37a104b",
+    "run_name": "nigeria_consistent_P1",
+    "network": "results/nigeria_consistent_P1/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "P1D",
+    "group": "gas",
+    "config": "configs/nigeria_study/P1D.yaml",
+    "config_sha256": "975df6a4a3a3e9f363f86fd47724d1f6f4ee0e0f81b81f21917a82a8881a9b32",
+    "run_name": "nigeria_consistent_P1D",
+    "network": "results/nigeria_consistent_P1D/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "P2",
+    "group": "policy",
+    "config": "configs/nigeria_study/P2.yaml",
+    "config_sha256": "ea014702e39bf88cf6a08202f1b56c753794659527bea5a7adbbf15896940e90",
+    "run_name": "nigeria_consistent_P2",
+    "network": "results/nigeria_consistent_P2/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "P3",
+    "group": "policy",
+    "config": "configs/nigeria_study/P3.yaml",
+    "config_sha256": "cd8f0bc6ffa8da0e01cf6ae0c68e296b5be119ba0c3fbf02ff6c6e46474a68b1",
+    "run_name": "nigeria_consistent_P3",
+    "network": "results/nigeria_consistent_P3/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "P4",
+    "group": "policy",
+    "config": "configs/nigeria_study/P4.yaml",
+    "config_sha256": "32aa6d4be4690f95511889515cac9d687c92069462efd4d7975eccff0352f704",
+    "run_name": "nigeria_consistent_P4",
+    "network": "results/nigeria_consistent_P4/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "S2a",
+    "group": "battery",
+    "config": "configs/nigeria_study/S2a.yaml",
+    "config_sha256": "d3e7de937b048e26ea9d538f74dc2e779f3d8186da86f7b3b74f6edc7cfb0963",
+    "run_name": "nigeria_consistent_S2a",
+    "network": "results/nigeria_consistent_S2a/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "S2b",
+    "group": "battery",
+    "config": "configs/nigeria_study/S2b.yaml",
+    "config_sha256": "ba77128b517a820f57e6330bebf8d9e08c703a4fa20b4e6fba3a14cf27633b03",
+    "run_name": "nigeria_consistent_S2b",
+    "network": "results/nigeria_consistent_S2b/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "S_nominal",
+    "group": "sensitivity",
+    "config": "configs/nigeria_study/S_nominal.yaml",
+    "config_sha256": "0f80fa1180a3d118ea8e049a712e2059f79ab86e4d98960b4c6e17b0270249cc",
+    "run_name": "nigeria_consistent_S_nominal",
+    "network": "results/nigeria_consistent_S_nominal/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "S_gas85",
+    "group": "sensitivity",
+    "config": "configs/nigeria_study/S_gas85.yaml",
+    "config_sha256": "2c376333a2ba526a9930d777de2ea8eafa2d8dab362c0bb49c8c09376aa58348",
+    "run_name": "nigeria_consistent_S_gas85",
+    "network": "results/nigeria_consistent_S_gas85/networks/elec_s_10_ec_lcopt_1h.nc"
+  },
+  {
+    "scenario": "S_inflation4",
+    "group": "sensitivity",
+    "config": "configs/nigeria_study/S_inflation4.yaml",
+    "config_sha256": "eaceaa810efe20bfa0585c362dfdcb7c92a408d86bbb87892be372bca2e6268e",
+    "run_name": "nigeria_consistent_S_inflation4",
+    "network": "results/nigeria_consistent_S_inflation4/networks/elec_s_10_ec_lcopt_1h.nc"
+  }
+]

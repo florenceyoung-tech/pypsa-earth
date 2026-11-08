@@ -1,0 +1,38 @@
+{
+  "versions": {
+    "pypsa": "0.30.3",
+    "atlite": "0.4.1",
+    "pandas": "2.3.1",
+    "numpy": "1.26.4",
+    "linopy": "0.5.5",
+    "snakemake": "7.32.4"
+  },
+  "solar_reference": "IRENA solar CAPEX is per kW_DC; confirm the installed profile normalisation uses panel-rated capacity before final capacity reporting.",
+  "CSi_panel": {
+    "model": "huld",
+    "name": "CSi",
+    "source": "Huld 2010",
+    "efficiency": 0.1,
+    "c_temp_amb": 1,
+    "c_temp_irrad": 0.035,
+    "r_tamb": 293,
+    "r_tmod": 298,
+    "r_irradiance": 1000,
+    "k_1": -0.017162,
+    "k_2": -0.040289,
+    "k_3": -0.004681,
+    "k_4": 0.000148,
+    "k_5": 0.000169,
+    "k_6": 5e-06,
+    "inverter_efficiency": 0.9
+  },
+  "pv_model_file_sha256": "20ff603aa1b4235aa21a1584b2050e85e88d4b054d4bd96a63e136131ae5b3f2",
+  "pv_reference_probe": {
+    "without_inverter_loss": 1.0,
+    "with_configured_inverter": 0.9,
+    "expected_inverter_efficiency": 0.9,
+    "panel_normalisation_check_passed": true,
+    "scope": "Tests installed panel model normalisation; does not verify AC/DC basis of the inherited existing-fleet statistics"
+  },
+  "cached_base_annual_weightings_checked": true
+}

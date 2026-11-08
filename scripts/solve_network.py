@@ -1194,6 +1194,10 @@ def solve_network(n, config, solving, **kwargs):
         n.model.print_infeasibilities()
         raise RuntimeError("Solving status 'infeasible'")
 
+    if config.get("nigeria_study", {}).get("enabled") and (status != "ok" or condition != "optimal"):
+        raise RuntimeError(f"Nigeria study requires optimal termination, got {status}/{condition}")
+    n.meta["solver_result"] = {"status": str(status), "termination_condition": str(condition)}
+
     return n
 
 
@@ -1257,7 +1261,13 @@ if __name__ == "__main__":
         solving=snakemake.params.solving,
         log_fn=snakemake.log.solver,
     )
+    audit = n.meta.get("nigeria_audit")
+    solver_result = n.meta.get("solver_result")
     n.meta = dict(snakemake.config, **dict(wildcards=dict(snakemake.wildcards)))
+    if audit:
+        n.meta["nigeria_audit"] = audit
+    if solver_result:
+        n.meta["solver_result"] = solver_result
     n.export_to_netcdf(snakemake.output[0])
     logger.info(f"Objective function: {n.objective}")
     logger.info(f"Objective constant: {n.objective_constant}")

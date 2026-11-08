@@ -553,7 +553,7 @@ rule process_cost_data:
         costs=branch(
             config["enable"].get("retrieve_cost_data", True),
             "resources/" + RDIR + "costs_{year}.csv",
-            "data/costs.csv",
+            config["costs"].get("input_file", "data/costs.csv"),
         ),
     output:
         "resources/" + RDIR + "costs_{year}_{scope}.csv",
@@ -951,6 +951,7 @@ def custom_line_types_input():
 
 rule prepare_network:
     params:
+        nigeria_study=config.get("nigeria_study", {}),
         links=config["links"],
         lines=config["lines"],
         s_max_pu=config["lines"]["s_max_pu"],

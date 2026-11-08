@@ -43,6 +43,7 @@ SCENARIOS=(
   "config.nigeria.2030_C6_wacc_1379.yaml|339"
   "config.nigeria.2030_C7_wacc_1468.yaml|339"
   "config.nigeria.2030_C8_wacc_1600.yaml|339"
+  "config.nigeria.2030_C8_5_wacc_1700.yaml|339"
   "config.nigeria.2030_C9_wacc_1800.yaml|339"
   "config.nigeria.2030_C10_wacc_2000.yaml|339"
 

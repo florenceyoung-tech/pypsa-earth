@@ -3,10 +3,14 @@ run:
 countries:
 - NG
 scenario:
-  simpl: ['']
-  ll: [copt]
-  clusters: [10]
-  opts: [1h]
+  simpl:
+  - ''
+  ll:
+  - copt
+  clusters:
+  - 10
+  opts:
+  - 1h
 snapshots:
   start: '2024-01-01'
   end: '2025-01-01'
@@ -28,7 +32,9 @@ atlite:
       module: era5
       dx: 0.3
       dy: 0.3
-      time: ['2024-01-01', '2025-01-01']
+      time:
+      - '2024-01-01'
+      - '2025-01-01'
   default: cutout-2024-era5
 renewable:
   onwind:
@@ -38,9 +44,27 @@ renewable:
       turbine: Vestas_V112_3MW
     capacity_per_sqkm: 3
     copernicus:
-      grid_codes: [20, 30, 40, 60, 100, 111, 112, 113, 114, 115, 116, 121, 122, 123, 124, 125, 126]
+      grid_codes:
+      - 20
+      - 30
+      - 40
+      - 60
+      - 100
+      - 111
+      - 112
+      - 113
+      - 114
+      - 115
+      - 116
+      - 121
+      - 122
+      - 123
+      - 124
+      - 125
+      - 126
       distance: 1000
-      distance_grid_codes: [50]
+      distance_grid_codes:
+      - 50
     natura: true
     potential: simple
     clip_p_max_pu: 0.01
@@ -54,7 +78,14 @@ renewable:
     capacity_per_sqkm: 4.6
     correction_factor: 1.0
     copernicus:
-      grid_codes: [20, 30, 40, 50, 60, 90, 100]
+      grid_codes:
+      - 20
+      - 30
+      - 40
+      - 50
+      - 60
+      - 90
+      - 100
     natura: true
     potential: simple
     clip_p_max_pu: 0.01
@@ -66,7 +97,10 @@ renewable:
       method: hydro
       hydrobasins: data/hydrobasins/hybas_world.shp
       flowspeed: 1.0
-    carriers: [ror, hydro, PHS]
+    carriers:
+    - ror
+    - hydro
+    - PHS
     hydro_max_hours: energy_capacity_totals_by_country
     hydro_max_hours_default: 6.0
     clip_min_inflow: 1.0
@@ -82,7 +116,10 @@ conventional:
   OCGT:
     p_max_pu: 0.217
 clustering:
-  exclude_carriers: [oil, gas, coal]
+  exclude_carriers:
+  - oil
+  - gas
+  - coal
   remove_stubs: true
   p_threshold_drop_isolated: 100
 base_network:
@@ -94,16 +131,31 @@ load_options:
   scale: 2.074
 electricity:
   base_voltage: 330.0
-  voltages: [132.0, 330.0]
-  renewable_carriers: [solar, onwind, hydro]
-  conventional_carriers: [oil, OCGT, CCGT, biomass]
+  voltages:
+  - 132.0
+  - 330.0
+  renewable_carriers:
+  - solar
+  - onwind
+  - hydro
+  conventional_carriers:
+  - oil
+  - OCGT
+  - CCGT
+  - biomass
   extendable_carriers:
-    Generator: [solar, onwind, OCGT, CCGT]
-    StorageUnit: [battery]
+    Generator:
+    - solar
+    - onwind
+    - OCGT
+    - CCGT
+    StorageUnit:
+    - battery
     Store: []
   max_hours:
     battery: 6
-  powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030 or DateIn != DateIn)
+  powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030
+    or DateIn != DateIn)
   custom_powerplants: replace
   estimate_renewable_capacities:
     stats: irena
@@ -111,6 +163,8 @@ electricity:
   conventional_efficiency:
     CCGT: 0.58
     OCGT: 0.41
+  allow_retirement: true
+  split_existing: true
 lines:
   s_max_pu: 1.0
   custom_line_types: data/line_types.csv
@@ -118,34 +172,48 @@ lines:
     330.0: ACSR Zebra 2-bundle 330.0
 costs:
   year: 2030
-  discountrate: [0.1200]
+  discountrate:
+  - 0.12
   discountrate_groups:
     renewable:
-      rate: 0.1200
-      carriers: [solar, solar-utility, solar-rooftop, onwind]
+      rate: 0.12
+      carriers:
+      - solar
+      - solar-utility
+      - solar-rooftop
+      - onwind
     hydro:
-      rate: 0.1200
-      carriers: [hydro, ror, PHS]
+      rate: 0.12
+      carriers:
+      - hydro
+      - ror
+      - PHS
     battery:
-      rate: 0.1200
-      carriers: [battery storage, battery inverter]
+      rate: 0.12
+      carriers:
+      - battery storage
+      - battery inverter
     fossil:
       rate: 0.1468
-      carriers: [OCGT, CCGT]
+      carriers:
+      - OCGT
+      - CCGT
+    transmission:
+      rate: 0.1468
+      carriers:
+      - HVAC overhead
+      - HVDC overhead
+      - HVDC submarine
+      - HVDC inverter pair
 solving:
   options:
-    load_shedding: 1.0
+    load_shedding: 10.0
   solver:
     name: gurobi
     options: gurobi-default
 validation:
   interconnectors:
     enable: false
-
-# Explicitly disable the CO2 cap. Without this block, this scenario
-# inherits co2.limit from config.default.yaml (7.75e+7 tCO2/yr) and the
-# add_co2_constraint rule fires with the European default.
-# null makes `if config['co2'].get('limit'):` falsy in the Snakefile.
 co2:
   limit: null
   base: 0.0

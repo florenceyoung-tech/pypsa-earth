@@ -1,0 +1,117 @@
+{
+  "source_run": "nigeria_consistent_B2",
+  "source_config": "configs/nigeria_study/B2.yaml",
+  "source_config_sha256": "97ee3e0e9ca6df167d07cd94ef0ef736bca5f18b3cd7c1cccfabfc36c654530d",
+  "files": [
+    {
+      "area": "networks",
+      "relative": "base.nc",
+      "source": "networks/nigeria_consistent_B2/base.nc",
+      "sha256": "7e2a7a2ea4546bb353ef060a5857a9382743fb6080812a73bc555133dc68c303",
+      "size_bytes": 1809154
+    },
+    {
+      "area": "resources",
+      "relative": "powerplants.csv",
+      "source": "resources/nigeria_consistent_B2/powerplants.csv",
+      "sha256": "81cb9842dfddb4b6f6241c4c47d00da8463e13f60ee3efc67449f59ddcf6ac2c",
+      "size_bytes": 1672
+    },
+    {
+      "area": "resources",
+      "relative": "demand_profiles.csv",
+      "source": "resources/nigeria_consistent_B2/demand_profiles.csv",
+      "sha256": "112db0553f3d16c9d34222a6fde757b027d01d80bc88c0ab4e563ed7b3970616",
+      "size_bytes": 29901149
+    },
+    {
+      "area": "resources",
+      "relative": "shapes/country_shapes.geojson",
+      "source": "resources/nigeria_consistent_B2/shapes/country_shapes.geojson",
+      "sha256": "700a75eee9ac9519014b4806a9f82f977de2e17f1749a462b21fa465152c55d7",
+      "size_bytes": 73859
+    },
+    {
+      "area": "resources",
+      "relative": "shapes/gadm_shapes.geojson",
+      "source": "resources/nigeria_consistent_B2/shapes/gadm_shapes.geojson",
+      "sha256": "95207e9ecde3e00729375915034c5911e8056a6af18ce2c6ab6b7c92dbc693c5",
+      "size_bytes": 189356
+    },
+    {
+      "area": "resources",
+      "relative": "bus_regions/regions_onshore.geojson",
+      "source": "resources/nigeria_consistent_B2/bus_regions/regions_onshore.geojson",
+      "sha256": "d092b0cbb45a3c774b23f9166ca440406da3e71619a2cac342b8dc0624925cf9",
+      "size_bytes": 163347
+    },
+    {
+      "area": "resources",
+      "relative": "bus_regions/regions_offshore.geojson",
+      "source": "resources/nigeria_consistent_B2/bus_regions/regions_offshore.geojson",
+      "sha256": "98a2c234e99bd31388838a7775bcdaaa4fcb628c2d4b2ac0b440ec232e3b3d13",
+      "size_bytes": 90643
+    },
+    {
+      "area": "resources",
+      "relative": "renewable_profiles/profile_onwind.nc",
+      "source": "resources/nigeria_consistent_B2/renewable_profiles/profile_onwind.nc",
+      "sha256": "cea3983fdc25263ec24a9d61cf2604576119eddb805b489e725fb028d7375c90",
+      "size_bytes": 13072871
+    },
+    {
+      "area": "resources",
+      "relative": "renewable_profiles/profile_solar.nc",
+      "source": "resources/nigeria_consistent_B2/renewable_profiles/profile_solar.nc",
+      "sha256": "8e319ecbf61cf33d946f9bfb73b63f76ccd3d68a9825ac72f7af659b81edec3e",
+      "size_bytes": 13072871
+    },
+    {
+      "area": "resources",
+      "relative": "renewable_profiles/profile_hydro.nc",
+      "source": "resources/nigeria_consistent_B2/renewable_profiles/profile_hydro.nc",
+      "sha256": "1e0b0aa5a94b3842caa0b9eaae12b9806a89c3fd525f0751ecab2475e5e48e65",
+      "size_bytes": 432154
+    },
+    {
+      "area": "resources",
+      "relative": "shapes/extended_country_shape.geojson",
+      "source": "resources/nigeria_consistent_B2/shapes/extended_country_shape.geojson",
+      "sha256": "658371596104f232b0cf38c5a124b740ab6d097fd04b01affbc47dc12ed9c1c7",
+      "size_bytes": 154955
+    },
+    {
+      "area": "resources",
+      "relative": "shapes/offshore_shapes.geojson",
+      "source": "resources/nigeria_consistent_B2/shapes/offshore_shapes.geojson",
+      "sha256": "ca902882f509dcd9cd36e39c7a8f57bbb466678dc2913309a4536f958665995d",
+      "size_bytes": 75677
+    },
+    {
+      "area": "resources",
+      "relative": "shapes/subregion_offshore.geojson",
+      "source": "resources/nigeria_consistent_B2/shapes/subregion_offshore.geojson",
+      "sha256": "1a9e5dc5a20062cf81c9f3ff078f0cde91a54043465daf4290ce5c0df66df583",
+      "size_bytes": 166
+    },
+    {
+      "area": "resources",
+      "relative": "shapes/subregion_shapes.geojson",
+      "source": "resources/nigeria_consistent_B2/shapes/subregion_shapes.geojson",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    }
+  ],
+  "allowed_rules": [
+    "process_cost_data",
+    "add_electricity",
+    "simplify_network",
+    "cluster_network",
+    "add_extra_components",
+    "prepare_network",
+    "add_co2_constraint",
+    "solve_network",
+    "solve_all_networks"
+  ],
+  "policy": "Frozen inputs are referenced by symlinks; their producers are excluded from the DAG"
+}

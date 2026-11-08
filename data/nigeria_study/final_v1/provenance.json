@@ -1,0 +1,13 @@
+{
+  "source_sha256": "289166e9b1acb1c92eb2732bc8761b7c4ee11cee68feaae22d89bebbb7f3a4a8",
+  "revised_sha256": "01ef8fd257b5280c6252fbbffd18260187a6001760b7b05dcf9d07feaa514b68",
+  "tool_sha256": "d95c9004e619f1c0d73c7d9206aa1cb6db6d7b81ffe74e83756ddd7c833510cf",
+  "previous_manifest_sha256": "1b3299068324de0ac8c81a892827b5c490a55b0fdd5ef4150fc0dd97baa9224f",
+  "core_scenarios": 29,
+  "optional_cost_checks": 2,
+  "excluded": [
+    "B3",
+    "D3"
+  ],
+  "status": "prepared; optimisation has not run"
+}
